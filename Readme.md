@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Maria Mikhaleva](https://up.htmlacademy.ru/javascript/19/user/1031959).
-* Наставник: `Неизвестно`.
+* Наставник: [Евгений Суглобов](https://htmlacademy.ru/profile/id1133747).
 
 ---
 
