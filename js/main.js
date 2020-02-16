@@ -29,6 +29,7 @@ var getRandomIntInclusive = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
+// Функция генерации объекта (мока)
 var getAdvertObject = function (options) {
   var avatarNumber = options.avatarNumber;
   var minX = options.minX;
@@ -68,6 +69,15 @@ var getAdvertObject = function (options) {
     }
   };
   return object;
+};
+
+// Функция получения массива сгенерированных объектов
+var getAdvertArray = function (offersAmount) {
+  var offers = [];
+  for (var i = 0; i < offersAmount.length; i++) {
+    offers.push(getAdvertObject(mock));
+  }
+  return offers;
 };
 
 // У блока map удаляем map--faded
