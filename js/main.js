@@ -1,20 +1,20 @@
 'use strict';
 
 var mock = {
-  OFFERS_AMOUNT: 8,
-  OFFER_TYPES: ['palace', 'flat', 'house', 'bungalo'],
-  OFFER_CHECKIN_TIMES: ['12:00', '13:00', '14:00'],
-  OFFER_CHECKOUT_TIMES: ['12:00', '13:00', '14:00'],
-  OFFER_FEATURES: ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'],
-  OFFER_PHOTOS: [
+  offersAmount: 8,
+  offerTypes: ['palace', 'flat', 'house', 'bungalo'],
+  offerCheckinTimes: ['12:00', '13:00', '14:00'],
+  offerCheckoutTimes: ['12:00', '13:00', '14:00'],
+  offerFeatures: ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'],
+  offerPhotos: [
     'http://o0.github.io/assets/images/tokyo/hotel1.jpg',
     'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
     'http://o0.github.io/assets/images/tokyo/hotel3.jpg',
   ],
-  LOCATION_X_MIN: 0,
-  LOCATION_X_MAX: 1200,
-  LOCATION_Y_MIN: 130,
-  LOCATION_Y_MAX: 630,
+  locationMinX: 0,
+  locationMaxX: 1200,
+  locationMinY: 130,
+  locationMaxY: 630,
 };
 
 // Функция нахождения рандомного элемента массива
@@ -29,26 +29,27 @@ var getRandomIntInclusive = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-// Функция генерации объекта (мока)
-var getAdvertObject = function (options) {
-  var avatarNumber = options.avatarNumber;
-  var minX = options.minX;
-  var minY = options.minY;
-  var maxX = options.maxX;
-  var maxY = options.maxY;
+// Функция генерации массива с объектами
+var getAdvertsArray = function (options) {
+  var offers = [];
+  for (var i = 0; i < options.offersAmount; i++) {
+  var minX = options.locationMinX;
+  var minY = options.locationMinY;
+  var maxX = options.locationMaxX;
+  var maxY = options.locationMaxY;
 
   var locationX = getRandomIntInclusive(minX, maxX);
   var locationY = getRandomIntInclusive(minY, maxY);
 
-  var type = getRandomArrayElement(options.OFFER_TYPES);
-  var checkin = getRandomArrayElement(options.OFFER_CHECKIN_TIMES);
-  var checkout = getRandomArrayElement(options.OFFER_CHECKOUT_TIMES);
-  var features = getRandomArrayElement(options.OFFER_FEATURES);
-  var photos = getRandomArrayElement(options.OFFER_PHOTOS);
+  var type = getRandomArrayElement(options.offerTypes);
+  var checkin = getRandomArrayElement(options.offerCheckinTimes);
+  var checkout = getRandomArrayElement(options.offerCheckoutTimes);
+  var features = getRandomArrayElement(options.offerFeatures);
+  var photos = getRandomArrayElement(options.offerPhotos);
 
-  var object = {
+  offers.push({
     author: {
-      avatar: 'img/avatars/user0' + avatarNumber + '.png',
+      avatar: 'img/avatars/user0' + (i + 1) + '.png',
     },
     offer: {
       title: 'заголовок предложения',
@@ -67,15 +68,7 @@ var getAdvertObject = function (options) {
       x: locationX,
       y: locationY,
     }
-  };
-  return object;
-};
-
-// Функция получения массива сгенерированных объектов
-var getAdvertArray = function (offersAmount) {
-  var offers = [];
-  for (var i = 0; i < offersAmount.length; i++) {
-    offers.push(getAdvertObject(mock));
+  });
   }
   return offers;
 };
