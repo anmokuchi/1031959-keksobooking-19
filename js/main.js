@@ -74,7 +74,23 @@ var getAdvertsArray = function (options) {
 };
 
 // У блока map удаляем map--faded
-var map = document.querySelector('.map').classList.remove('map--faded');
+var offersMap = document.querySelector('.map').classList.remove('map--faded');
 
 // Записываем в переменную шаблон пина
 var pinTemplate = document.querySelector('#pin').content.querySelector('button');
+
+var renderPin = function (template, offer, map) {
+  var pinElement = template.cloneNode(true);
+  var pinWidth = 50;
+  var pinHeight = 70;
+  var pinPosition = 'left: ' + (offer.location.x - (pinWidth / 2)) + 'px; top: ' + (offer.location.y - pinHeight) + 'px;';
+
+  map.appendChild(pinElement);
+  pinElement.style = pinPosition;
+  pinElement.querySelector('img').src = offer.author.avatar;
+  pinElement.querySelector('img').alt = offer.offer.title;
+
+  return pinElement;
+};
+
+var mapPins = document.querySelector('.map__pins');
