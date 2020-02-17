@@ -18,8 +18,8 @@ var mock = {
 };
 
 // Функция нахождения рандомного элемента массива
-var getRandomArrayElement = function (arrayName) {
-  return arrayName[Math.floor(Math.random() * arrayName.length)];
+var getRandomArrayElement = function (objects) {
+  return objects[Math.floor(Math.random() * objects.length)];
 };
 
 // Функция нахождения рандомного числа, включая максимум и минимум
@@ -74,4 +74,7 @@ var getAdvertsArray = function (options) {
 };
 
 // У блока map удаляем map--faded
-document.querySelector('.map').classList.remove('map--faded');
+var map = document.querySelector('.map').classList.remove('map--faded');
+
+// Записываем в переменную шаблон пина
+var pinTemplate = document.querySelector('#pin').content.querySelector('button');
