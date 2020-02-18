@@ -30,7 +30,7 @@ var getRandomIntInclusive = function (min, max) {
 };
 
 // Функция генерации массива с объектами
-var getAdvertsArray = function (options) {
+var getAdverts = function (options) {
   var offers = [];
   for (var i = 0; i < options.offersAmount; i++) {
   var minX = options.locationMinX;
@@ -73,25 +73,46 @@ var getAdvertsArray = function (options) {
   return offers;
 };
 
+// Записываем результат работы функции в переменную
+var adverts = getAdverts(mock); // тут лежит массив из 8 сгенерированных объектов
+
 // У блока map удаляем map--faded
-var offersMap = document.querySelector('.map').classList.remove('map--faded');
+var offersMap = document.querySelector('.map')
+offersMap.classList.remove('map--faded');
 
 // Записываем в переменную шаблон метки объявления
-var pinTemplate = document.querySelector('#pin').content.querySelector('button');
+var pinTemplate = document.querySelector('#pin')
+  .content
+  .querySelector('button');
+
+// Размеры метки
+var pinWidth = 50;
+var pinHeight = 70;
 
 // Находим элемент, куда добавлять метки объявлений
 var mapPins = document.querySelector('.map__pins');
 
 // Функция отрисовки метки
-var renderPin = function (template, offer) {
+var renderPin = function (offer, template) {
   var pinElement = template.cloneNode(true);
-  var pinWidth = 50;
-  var pinHeight = 70;
   var pinPosition = 'left: ' + (offer.location.x - (pinWidth / 2)) + 'px; top: ' + (offer.location.y - pinHeight) + 'px;';
 
+  offersMap.appendChild(pinElement);
   pinElement.style = pinPosition;
   pinElement.querySelector('img').src = offer.author.avatar;
   pinElement.querySelector('img').alt = offer.offer.title;
 
   return pinElement;
 };
+
+// Функция добавления меток во фрагмент и затем на страницу
+var addPin = function (options) {
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < options.length; i++) {
+    fragment.appendChild(renderPin(options[i], pinTemplate));
+  }
+  mapPins.appendChild(fragment);
+};
+
+// Вызов функции добавления меток
+addPin(adverts);
