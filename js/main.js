@@ -93,9 +93,9 @@ var pinHeight = 70;
 var mapPins = document.querySelector('.map__pins');
 
 // Функция отрисовки метки
-var renderPin = function (offer, template) {
+var renderPin = function (offer, template, width, height) {
   var pinElement = template.cloneNode(true);
-  var pinPosition = 'left: ' + (offer.location.x - (pinWidth / 2)) + 'px; top: ' + (offer.location.y - pinHeight) + 'px;';
+  var pinPosition = 'left: ' + (offer.location.x - (width / 2)) + 'px; top: ' + (offer.location.y - height) + 'px;';
 
   offersMap.appendChild(pinElement);
   pinElement.style = pinPosition;
@@ -106,13 +106,13 @@ var renderPin = function (offer, template) {
 };
 
 // Функция добавления меток во фрагмент и затем на страницу
-var addPin = function (options) {
+var addPin = function (options, template, width, height) {
   var fragment = document.createDocumentFragment();
   for (var i = 0; i < options.length; i++) {
-    fragment.appendChild(renderPin(options[i], pinTemplate));
+    fragment.appendChild(renderPin(options[i], template, width, height));
   }
   mapPins.appendChild(fragment);
 };
 
 // Вызов функции добавления меток
-addPin(adverts);
+addPin(adverts, pinTemplate, pinWidth, pinHeight);
