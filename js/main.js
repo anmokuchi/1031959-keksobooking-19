@@ -14,8 +14,8 @@ var mock = {
     'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
     'http://o0.github.io/assets/images/tokyo/hotel3.jpg',
   ],
-  locationMinX: coordinates.left,
-  locationMaxX: coordinates.right,
+  locationMinX: 0,
+  locationMaxX: coordinates.width,
   locationMinY: 130,
   locationMaxY: 630,
 };
