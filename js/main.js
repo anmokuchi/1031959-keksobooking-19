@@ -1,5 +1,8 @@
 'use strict';
 
+var mapImage = document.querySelector('.map');
+var coordinates = mapImage.getBoundingClientRect();
+
 var mock = {
   offersAmount: 8,
   offerTypes: ['palace', 'flat', 'house', 'bungalo'],
@@ -11,8 +14,8 @@ var mock = {
     'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
     'http://o0.github.io/assets/images/tokyo/hotel3.jpg',
   ],
-  locationMinX: 0,
-  locationMaxX: 1200,
+  locationMinX: coordinates.left,
+  locationMaxX: coordinates.right,
   locationMinY: 130,
   locationMaxY: 630,
 };
