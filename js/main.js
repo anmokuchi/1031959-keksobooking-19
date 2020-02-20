@@ -60,8 +60,8 @@ var getAdverts = function (options) {
     var type = getRandomArrayElement(options.offerTypes);
     var checkin = getRandomArrayElement(options.offerCheckinTimes);
     var checkout = getRandomArrayElement(options.offerCheckoutTimes);
-    var features = getRandomArrayElement(options.offerFeatures);
-    var photos = getRandomArrayElement(options.offerPhotos);
+    var features = getRandomArray(options.offerFeatures);
+    var photos = getRandomArray(options.offerPhotos);
 
     offers.push({
       author: {
