@@ -1,5 +1,7 @@
 'use strict';
 
+// Нахождение DOM-элемента с картой для определения координат по оси Х
+// в зависимости от размера окна
 var mapImage = document.querySelector('.map');
 var coordinates = mapImage.getBoundingClientRect();
 
@@ -30,6 +32,17 @@ var getRandomIntInclusive = function (min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+// Функция генерации массива со случайными свойствами
+var getRandomArray = function (options) {
+  var features = [];
+  var max = getRandomIntInclusive(1, options.length);
+  options.sort();
+  for (var i = 0; i < max; i++) {
+    features.push(' ' + options[i]);
+  }
+  return features;
 };
 
 // Функция генерации массива с объектами
