@@ -199,3 +199,6 @@ var renderCard = function (offer, template) {
 
   return cardElement;
 };
+
+// Записываем в переменную результат работы функции отрисовки объявления
+var firstCard = renderCard(adverts[0], cardTemplate);
