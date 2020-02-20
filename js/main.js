@@ -206,3 +206,9 @@ var firstCard = renderCard(adverts[0], cardTemplate);
 // Добавлен фрагмент для вставки элементов
 var cardFragment = document.createDocumentFragment();
 cardFragment.appendChild(firstCard);
+
+// Записываем в переменную элемент, перед которым поместить фрагмент
+var filtersContainer = offersMap.querySelector('.map__filters-container');
+
+// Помещаем фрагмент
+offersMap.insertBefore(cardFragment, filtersContainer);
