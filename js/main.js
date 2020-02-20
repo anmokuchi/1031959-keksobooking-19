@@ -132,3 +132,9 @@ var addPin = function (options, template, width, height) {
 
 // Вызов функции добавления меток
 addPin(adverts, pinTemplate, pinWidth, pinHeight);
+
+// Записываем в переменную шаблон карточки объявления
+var cardTemplate = document.querySelector('#card')
+  .content
+  .querySelector('.map__card');
+
