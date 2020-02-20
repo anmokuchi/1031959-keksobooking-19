@@ -202,3 +202,7 @@ var renderCard = function (offer, template) {
 
 // Записываем в переменную результат работы функции отрисовки объявления
 var firstCard = renderCard(adverts[0], cardTemplate);
+
+// Добавлен фрагмент для вставки элементов
+var cardFragment = document.createDocumentFragment();
+cardFragment.appendChild(firstCard);
