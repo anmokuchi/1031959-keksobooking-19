@@ -138,3 +138,16 @@ var cardTemplate = document.querySelector('#card')
   .content
   .querySelector('.map__card');
 
+// Функция определения типа жилья
+var getOfferType = function (offer) {
+  if (offer.offer.type === 'palace') {
+    var houseType = 'Дворец';
+  } else if (offer.offer.type === 'flat') {
+    houseType = 'Квартира';
+  } else if (offer.offer.type === 'house') {
+    houseType = 'Дом';
+  } else if (offer.offer.type === 'bungalo') {
+    houseType = 'Бунгало';
+  }
+  return houseType;
+};
