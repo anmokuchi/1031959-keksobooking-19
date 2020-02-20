@@ -151,3 +151,14 @@ var getOfferType = function (offer) {
   }
   return houseType;
 };
+
+// Функция для создания иконок с фотографиями
+var createPhotos = function (photos, template) {
+  var fragment = document.createDocumentFragment();
+  photos.forEach(function (src) {
+    var img = template.cloneNode(true);
+    img.src = src;
+    fragment.appendChild(img);
+  });
+  return fragment;
+};
