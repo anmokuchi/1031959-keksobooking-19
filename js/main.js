@@ -193,7 +193,7 @@ var renderCard = function (offer, template) {
   cardElement.querySelector('.popup__type').textContent = houseType;
   cardElement.querySelector('.popup__text--capacity').textContent = offer.offer.rooms + roomText + ' для ' + offer.offer.guests + guestText;
   cardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + offer.offer.checkin + ', выезд до ' + offer.offer.checkout;
-  cardElement.querySelector('.popup__features').textContent = offer.offer.features;
+  cardElement.querySelector('.popup__features').textContent = offer.offer.features.join(', ');
   cardElement.querySelector('.popup__description').textContent = offer.offer.description;
   cardElement.querySelector('.popup__avatar').src = offer.author.avatar;
 
