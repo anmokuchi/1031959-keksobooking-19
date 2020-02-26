@@ -34,15 +34,20 @@ var getRandomIntInclusive = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
+// Алгоритм Фишера-Йетса
+var shuffle = function (array) {
+  for (var i = array.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = array[i]; array[i] = array[j]; array[j] = t;
+  }
+  return array;
+};
+
 // Функция генерации массива со случайными свойствами
 var getRandomArray = function (options) {
-  var features = [];
-  var max = getRandomIntInclusive(1, options.length);
-  options.sort();
-  for (var i = 0; i < max; i++) {
-    features.push(' ' + options[i]);
-  }
-  return features;
+  var optionsCopy = options.slice();
+  var optionsCopyRandom = shuffle(optionsCopy);
+  return optionsCopyRandom.slice(getRandomIntInclusive(0, optionsCopyRandom.length));
 };
 
 // Функция генерации массива с объектами
