@@ -5,6 +5,7 @@
 var mapImage = document.querySelector('.map');
 var coordinates = mapImage.getBoundingClientRect();
 
+// Данные мока
 var mock = {
   offersAmount: 8,
   offerTypes: ['palace', 'flat', 'house', 'bungalo'],
@@ -20,6 +21,14 @@ var mock = {
   locationMaxX: coordinates.width,
   locationMinY: 130,
   locationMaxY: 630,
+};
+
+// Объект-словарь с типами жилья
+var translate = {
+  flat: 'Квартира',
+  bungalo: 'Бунгало',
+  house: 'Дом',
+  palace: 'Дворец'
 };
 
 // Функция нахождения рандомного элемента массива
@@ -114,11 +123,11 @@ var pinHeight = 70;
 var mapPins = document.querySelector('.map__pins');
 
 // Функция отрисовки метки
-var renderPin = function (offer, template, width, height) {
+var renderPin = function (map, offer, template, width, height) {
   var pinElement = template.cloneNode(true);
   var pinPosition = 'left: ' + (offer.location.x - (width / 2)) + 'px; top: ' + (offer.location.y - height) + 'px;';
 
-  offersMap.appendChild(pinElement);
+  map.appendChild(pinElement);
   pinElement.style = pinPosition;
   pinElement.querySelector('img').src = offer.author.avatar;
   pinElement.querySelector('img').alt = offer.offer.title;
@@ -126,36 +135,17 @@ var renderPin = function (offer, template, width, height) {
   return pinElement;
 };
 
-// Функция добавления меток во фрагмент и затем на страницу
-var addPin = function (options, template, width, height) {
-  var fragment = document.createDocumentFragment();
-  for (var i = 0; i < options.length; i++) {
-    fragment.appendChild(renderPin(options[i], template, width, height));
-  }
-  mapPins.appendChild(fragment);
-};
-
-// Вызов функции добавления меток
-addPin(adverts, pinTemplate, pinWidth, pinHeight);
+// Цикл добавления меток во фрагмент и затем на страницу
+var pinsFragment = document.createDocumentFragment();
+for (var i = 0; i < adverts.length; i++) {
+  pinsFragment.appendChild(renderPin(offersMap, adverts[i], pinTemplate, pinWidth, pinHeight));
+}
+mapPins.appendChild(pinsFragment);
 
 // Записываем в переменную шаблон карточки объявления
 var cardTemplate = document.querySelector('#card')
   .content
   .querySelector('.map__card');
-
-// Функция определения типа жилья
-var getOfferType = function (offer) {
-  if (offer.offer.type === 'palace') {
-    var houseType = 'Дворец';
-  } else if (offer.offer.type === 'flat') {
-    houseType = 'Квартира';
-  } else if (offer.offer.type === 'house') {
-    houseType = 'Дом';
-  } else if (offer.offer.type === 'bungalo') {
-    houseType = 'Бунгало';
-  }
-  return houseType;
-};
 
 // Функция для создания иконок с фотографиями
 var createPhotos = function (photos, template) {
@@ -176,7 +166,6 @@ var declOfNum = function (number, titles) {
 
 // Функция отрисовки окна с объявлением
 var renderCard = function (offer, template) {
-  var houseType = getOfferType(offer);
   var roomText = declOfNum(offer.offer.rooms, [' комната', ' комнаты', ' комнат']);
   var guestText = declOfNum(offer.offer.guests, [' гостя', ' гостей', ' гостей']);
 
@@ -186,7 +175,7 @@ var renderCard = function (offer, template) {
   cardElement.querySelector('.popup__title').textContent = offer.offer.title;
   cardElement.querySelector('.popup__text--address').textContent = offer.offer.address;
   cardElement.querySelector('.popup__text--price').textContent = offer.offer.price + '₽/ночь';
-  cardElement.querySelector('.popup__type').textContent = houseType;
+  cardElement.querySelector('.popup__type').textContent = translate[offer.offer.type];
   cardElement.querySelector('.popup__text--capacity').textContent = offer.offer.rooms + roomText + ' для ' + offer.offer.guests + guestText;
   cardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + offer.offer.checkin + ', выезд до ' + offer.offer.checkout;
   cardElement.querySelector('.popup__features').textContent = offer.offer.features.join(', ');
