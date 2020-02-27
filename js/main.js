@@ -168,21 +168,17 @@ var createPhotos = function (photos, template) {
   return fragment;
 };
 
+// Функция склонения числительных
+var declOfNum = function (number, titles) {
+  var cases = [2, 0, 1, 1, 1, 2];
+  return titles [(number % 100 > 4 && number % 100 < 20) ? 2 : cases [(number % 10 < 5) ? number % 10 : 5]];
+};
+
 // Функция отрисовки окна с объявлением
 var renderCard = function (offer, template) {
   var houseType = getOfferType(offer);
-
-  var roomText = ' комната';
-  if (offer.offer.rooms > 1 && offer.offer.rooms < 5) {
-    roomText = ' комнаты';
-  } else if (offer.offer.rooms >= 5) {
-    roomText = ' комнат';
-  }
-
-  var guestText = ' гостей';
-  if (offer.offer.guests === 1) {
-    guestText = ' гостя';
-  }
+  var roomText = declOfNum(offer.offer.rooms, [' комната', ' комнаты', ' комнат']);
+  var guestText = declOfNum(offer.offer.guests, [' гостя', ' гостей', ' гостей']);
 
   var cardElement = template.cloneNode(true);
 
