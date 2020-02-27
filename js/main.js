@@ -123,22 +123,22 @@ var pinHeight = 70;
 var mapPins = document.querySelector('.map__pins');
 
 // Функция отрисовки метки
-var renderPin = function (map, offer, template, width, height) {
-  var pinElement = template.cloneNode(true);
+var renderPin = function (map, offer, element, width, height) {
   var pinPosition = 'left: ' + (offer.location.x - (width / 2)) + 'px; top: ' + (offer.location.y - height) + 'px;';
 
-  map.appendChild(pinElement);
-  pinElement.style = pinPosition;
-  pinElement.querySelector('img').src = offer.author.avatar;
-  pinElement.querySelector('img').alt = offer.offer.title;
+  map.appendChild(element);
+  element.style = pinPosition;
+  element.querySelector('img').src = offer.author.avatar;
+  element.querySelector('img').alt = offer.offer.title;
 
-  return pinElement;
+  return element;
 };
 
 // Цикл добавления меток во фрагмент и затем на страницу
 var pinsFragment = document.createDocumentFragment();
 for (var i = 0; i < adverts.length; i++) {
-  pinsFragment.appendChild(renderPin(offersMap, adverts[i], pinTemplate, pinWidth, pinHeight));
+  var pinElement = pinTemplate.cloneNode(true);
+  pinsFragment.appendChild(renderPin(offersMap, adverts[i], pinElement, pinWidth, pinHeight));
 }
 mapPins.appendChild(pinsFragment);
 
