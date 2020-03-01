@@ -147,34 +147,35 @@ var cardTemplate = document.querySelector('#card')
   .content
   .querySelector('.map__card');
 
+// Проверка данных и скрытие блока при их отсутствии
+var checkElementAvilability = function (element, elementContainer) {
+  if (element === undefined) {
+    elementContainer.classList.add('hidden');
+  }
+};
+
 // Функция для создания иконок с фотографиями
 var getPhotos = function (photos, photosContainer) {
-  if (photos.length === 0) {
-    photosContainer.style.display = 'none';
-  } else {
-    for (var j = 0; j < photos.length; j++) {
-      var newPopupPhoto = document.createElement('img');
-      newPopupPhoto.className = 'popup__photo';
-      newPopupPhoto.src = photos[j];
-      newPopupPhoto.width = '45';
-      newPopupPhoto.height = '40';
-      newPopupPhoto.alt = 'Фотография жилья';
-      photosContainer.appendChild(newPopupPhoto);
-    }
+  checkElementAvilability(photos, photosContainer);
+  for (var j = 0; j < photos.length; j++) {
+    var newPopupPhoto = document.createElement('img');
+    newPopupPhoto.className = 'popup__photo';
+    newPopupPhoto.src = photos[j];
+    newPopupPhoto.width = '45';
+    newPopupPhoto.height = '40';
+    newPopupPhoto.alt = 'Фотография жилья';
+    photosContainer.appendChild(newPopupPhoto);
   }
 };
 
 // Функция для создания иконок дополнительных особенностей жилья
 var getFeatures = function (features, featuresContainer) {
-  if (features.length === 0) {
-    featuresContainer.style.display = 'none';
-  } else {
-    for (var k = 0; k < features.length; k++) {
-      var newPopupFeature = document.createElement('li');
-      newPopupFeature.className =
+  checkElementAvilability(features, featuresContainer);
+  for (var k = 0; k < features.length; k++) {
+    var newPopupFeature = document.createElement('li');
+    newPopupFeature.className =
         'popup__feature popup__feature--' + features[k];
-      featuresContainer.appendChild(newPopupFeature);
-    }
+    featuresContainer.appendChild(newPopupFeature);
   }
 };
 
@@ -188,20 +189,46 @@ var declineTitle = function (number, titles) {
 var getCard = function (offer, element) {
   var roomText = declineTitle(offer.offer.rooms, [' комната', ' комнаты', ' комнат']);
   var guestText = declineTitle(offer.offer.guests, [' гостя', ' гостей', ' гостей']);
+
+  var popupTitle = element.querySelector('.popup__title');
+  var popupAddress = element.querySelector('.popup__text--address');
+  var popupPrice = element.querySelector('.popup__text--price');
+  var popupType = element.querySelector('.popup__type');
+  var popupCapacity = element.querySelector('.popup__text--capacity');
+  var popupTime = element.querySelector('.popup__text--time');
+  var popupDescription = element.querySelector('.popup__description');
+  var popupAvatar = element.querySelector('.popup__avatar');
   var popupPhotos = element.querySelector('.popup__photos');
   var popupFeatures = element.querySelector('.popup__features');
 
-  element.querySelector('.popup__title').textContent = offer.offer.title;
-  element.querySelector('.popup__text--address').textContent = offer.offer.address;
-  element.querySelector('.popup__text--price').textContent = offer.offer.price + '₽/ночь';
-  element.querySelector('.popup__type').textContent = translate[offer.offer.type];
-  element.querySelector('.popup__text--capacity').textContent = offer.offer.rooms + roomText + ' для ' + offer.offer.guests + guestText;
-  element.querySelector('.popup__text--time').textContent = 'Заезд после ' + offer.offer.checkin + ', выезд до ' + offer.offer.checkout;
-  element.querySelector('.popup__description').textContent = offer.offer.description;
-  element.querySelector('.popup__avatar').src = offer.author.avatar;
-  element.querySelector('.popup__features').innerText = '';
+  checkElementAvilability(offer.offer.title, popupTitle);
+  popupTitle.textContent = offer.offer.title;
+
+  checkElementAvilability(offer.offer.address, popupAddress);
+  popupAddress.textContent = offer.offer.address;
+
+  checkElementAvilability(offer.offer.price, popupPrice);
+  popupPrice.textContent = offer.offer.price + '₽/ночь';
+
+  checkElementAvilability(offer.offer.type, popupType);
+  popupType.textContent = translate[offer.offer.type];
+
+  checkElementAvilability(offer.offer.rooms, popupCapacity); // тут есть третий параметр, что делать?
+  popupCapacity.textContent = offer.offer.rooms + roomText + ' для ' + offer.offer.guests + guestText;
+
+  checkElementAvilability(offer.offer.checkin, popupTime); // и тут есть третий параметр, куда его деть?
+  popupTime.textContent = 'Заезд после ' + offer.offer.checkin + ', выезд до ' + offer.offer.checkout;
+
+  checkElementAvilability(offer.offer.description, popupDescription);
+  popupDescription.textContent = offer.offer.description;
+
+  // checkElementAvilability(offer.offer.avatar, popupAvatar); // если использовать эту проверку, аватар исчезает; почему и что делать?
+  popupAvatar.src = offer.author.avatar;
+
+  popupFeatures.innerText = '';
   getFeatures(offer.offer.features, popupFeatures);
-  element.querySelector('.popup__photos').innerText = '';
+
+  popupPhotos.innerText = '';
   getPhotos(offer.offer.photos, popupPhotos);
 
   return element;
