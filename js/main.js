@@ -147,42 +147,41 @@ var cardTemplate = document.querySelector('#card')
   .content
   .querySelector('.map__card');
 
-// Проверка данных и скрытие блока при их отсутствии
-var checkElementAvilability = function (element, elementContainer) {
-  if (element === undefined) {
-    elementContainer.classList.add('hidden');
-  }
-};
-
 // Функция для создания иконок с фотографиями
 var getPhotos = function (photos, photosContainer) {
-  checkElementAvilability(photos, photosContainer);
-  for (var j = 0; j < photos.length; j++) {
-    var newPopupPhoto = document.createElement('img');
-    newPopupPhoto.className = 'popup__photo';
-    newPopupPhoto.src = photos[j];
-    newPopupPhoto.width = '45';
-    newPopupPhoto.height = '40';
-    newPopupPhoto.alt = 'Фотография жилья';
-    photosContainer.appendChild(newPopupPhoto);
+  if (photos === undefined) {
+    photosContainer.classList.add('hidden');
+  } else {
+    for (var j = 0; j < photos.length; j++) {
+      var newPopupPhoto = document.createElement('img');
+      newPopupPhoto.className = 'popup__photo';
+      newPopupPhoto.src = photos[j];
+      newPopupPhoto.width = '45';
+      newPopupPhoto.height = '40';
+      newPopupPhoto.alt = 'Фотография жилья';
+      photosContainer.appendChild(newPopupPhoto);
+    }
   }
 };
 
 // Функция для создания иконок дополнительных особенностей жилья
 var getFeatures = function (features, featuresContainer) {
-  checkElementAvilability(features, featuresContainer);
-  for (var k = 0; k < features.length; k++) {
-    var newPopupFeature = document.createElement('li');
-    newPopupFeature.className =
+  if (features === undefined) {
+    featuresContainer.classList.add('hidden');
+  } else {
+    for (var k = 0; k < features.length; k++) {
+      var newPopupFeature = document.createElement('li');
+      newPopupFeature.className =
         'popup__feature popup__feature--' + features[k];
-    featuresContainer.appendChild(newPopupFeature);
+      featuresContainer.appendChild(newPopupFeature);
+    }
   }
 };
 
 // Функция склонения числительных
 var declineTitle = function (number, titles) {
   var cases = [2, 0, 1, 1, 1, 2];
-  return titles [(number % 100 > 4 && number % 100 < 20) ? 2 : cases [(number % 10 < 5) ? number % 10 : 5]];
+  return titles[(number % 100 > 4 && number % 100 < 20) ? 2 : cases[(number % 10 < 5) ? number % 10 : 5]];
 };
 
 // Функция отрисовки карточки с объявлением
@@ -201,29 +200,61 @@ var getCard = function (offer, element) {
   var popupPhotos = element.querySelector('.popup__photos');
   var popupFeatures = element.querySelector('.popup__features');
 
-  checkElementAvilability(offer.offer.title, popupTitle);
-  popupTitle.textContent = offer.offer.title;
+  if (offer.offer.title === undefined) {
+    popupTitle.classList.add('hidden');
+  } else {
+    popupTitle.textContent = offer.offer.title;
+  }
 
-  checkElementAvilability(offer.offer.address, popupAddress);
-  popupAddress.textContent = offer.offer.address;
+  if (offer.offer.address === undefined) {
+    popupAddress.classList.add('hidden');
+  } else {
+    popupAddress.textContent = offer.offer.address;
+  }
 
-  checkElementAvilability(offer.offer.price, popupPrice);
-  popupPrice.textContent = offer.offer.price + '₽/ночь';
+  if (offer.offer.price === undefined) {
+    popupPrice.classList.add('hidden');
+  } else {
+    popupPrice.textContent = offer.offer.price + '₽/ночь';
+  }
 
-  checkElementAvilability(offer.offer.type, popupType);
-  popupType.textContent = translate[offer.offer.type];
+  if (offer.offer.type === undefined) {
+    popupType.classList.add('hidden');
+  } else {
+    popupType.textContent = translate[offer.offer.type];
+  }
 
-  checkElementAvilability(offer.offer.rooms, popupCapacity); // тут есть третий параметр, что делать?
-  popupCapacity.textContent = offer.offer.rooms + roomText + ' для ' + offer.offer.guests + guestText;
+  if (offer.offer.rooms === undefined && offer.offer.guests === undefined) {
+    popupCapacity.classList.add('hidden');
+  } else if (offer.offer.guests === undefined) {
+    popupCapacity.textContent = offer.offer.rooms + roomText;
+  } else if (offer.offer.rooms === undefined) {
+    popupCapacity.textContent = 'Для ' + offer.offer.guests + guestText;
+  } else {
+    popupCapacity.textContent = offer.offer.rooms + roomText + ' для ' + offer.offer.guests + guestText;
+  }
 
-  checkElementAvilability(offer.offer.checkin, popupTime); // и тут есть третий параметр, куда его деть?
-  popupTime.textContent = 'Заезд после ' + offer.offer.checkin + ', выезд до ' + offer.offer.checkout;
+  if (offer.offer.checkin === undefined && offer.offer.checkout === undefined) {
+    popupTime.classList.add('hidden');
+  } else if (offer.offer.checkout === undefined) {
+    popupTime.textContent = 'Заезд после ' + offer.offer.checkin;
+  } else if (offer.offer.checkin === undefined) {
+    popupTime.textContent = 'Выезд до ' + offer.offer.checkout;
+  } else {
+    popupTime.textContent = 'Заезд после ' + offer.offer.checkin + ', выезд до ' + offer.offer.checkout;
+  }
 
-  checkElementAvilability(offer.offer.description, popupDescription);
-  popupDescription.textContent = offer.offer.description;
+  if (offer.offer.description === undefined) {
+    popupDescription.classList.add('hidden');
+  } else {
+    popupDescription.textContent = offer.offer.description;
+  }
 
-  // checkElementAvilability(offer.offer.avatar, popupAvatar); // если использовать эту проверку, аватар исчезает; почему и что делать?
-  popupAvatar.src = offer.author.avatar;
+  if (offer.author.avatar === undefined) {
+    popupAvatar.classList.add('hidden');
+  } else {
+    popupAvatar.src = offer.author.avatar;
+  }
 
   popupFeatures.innerText = '';
   getFeatures(offer.offer.features, popupFeatures);
