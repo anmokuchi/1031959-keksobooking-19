@@ -9,8 +9,10 @@ var coordinates = mapImage.getBoundingClientRect();
 var offersMap = document.querySelector('.map'); // карта с объявлениями
 var pinTemplate = document.querySelector('#pin').content.querySelector('button'); // шаблон метки объявления
 var mapPins = document.querySelector('.map__pins'); // элемент, куда добавлять метки объявлений
+var adForm = document.querySelector('.ad-form'); // форма объявления
 var adFormHeader = document.querySelector('.ad-form-header'); // заголовок формы
 var adFormElements = document.querySelectorAll('.ad-form__element'); // элементы формы
+var mapFilters = document.querySelector('.map__filters'); // форма с фильтрами
 
 // Размеры метки
 var pinWidth = 50;
@@ -123,22 +125,45 @@ var getPin = function (offer, element, width, height) {
   return element;
 };
 
-// Цикл добавления меток во фрагмент и затем на страницу
-var pinsFragment = document.createDocumentFragment();
-for (var i = 0; i < adverts.length; i++) {
-  var pinElement = pinTemplate.cloneNode(true);
-  offersMap.appendChild(pinElement);
-  pinsFragment.appendChild(getPin(adverts[i], pinElement, pinWidth, pinHeight));
-}
-mapPins.appendChild(pinsFragment);
+// Функция добавления меток во фрагмент и затем на страницу
+var getPins = function () {
+  var pinsFragment = document.createDocumentFragment();
+  for (var i = 0; i < adverts.length; i++) {
+    var pinElement = pinTemplate.cloneNode(true);
+    offersMap.appendChild(pinElement);
+    pinsFragment.appendChild(getPin(adverts[i], pinElement, pinWidth, pinHeight));
+  }
+  mapPins.appendChild(pinsFragment);
+};
+
+// Функция дезактивации массива элементов
+var disableElements = function (elements) {
+  for (var i = 0; i < elements.length; i++) {
+    elements[i].setAttribute('disabled', 'disabled');
+  }
+};
+
+// Функция активации массива элементов
+var enableElements = function (elements) {
+  for (var i = 0; i < elements.length; i++) {
+    elements[i].removeAttribute('disabled', 'disabled');
+  }
+};
 
 // Добавление атрибута disabled для элементов fieldset (блокируются поля формы в группе)
 adFormHeader.setAttribute('disabled', 'disabled'); // для заголовка формы
+disableElements(adFormElements); // для элементов формы
+mapFilters.setAttribute('disabled', 'disabled'); // для формы с фильтрами
 
-for (var l = 0; l < adFormElements.length; l++) { // для элементов формы
-  var adFormElement = adFormElements[l];
-  adFormElement.setAttribute('disabled', 'disabled');
-}
+// Функция активации страницы
+var activePage = function () {
+  offersMap.classList.remove('map--faded'); // удаление класса map--faded у карты с объявлениями для ее активации
+  adForm.classList.remove('ad-form--disabled'); // удаление класса ad-form--disabled у формы объявления для ее активации
+  getPins(); // вызов функции добавления меток
+  adFormHeader.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с заголовка формы
+  enableElements(adFormElements); // удаление атрибута disabled с элементов формы
+  mapFilters.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с формы с фильтрами
+};
 
 /* // Записываем в переменную шаблон карточки объявления
 var cardTemplate = document.querySelector('#card')
