@@ -226,20 +226,12 @@ var getCard = function (offer, element) {
 
   if (offer.offer.rooms === undefined && offer.offer.guests === undefined) {
     popupCapacity.classList.add('hidden');
-  } else if (offer.offer.guests === undefined) {
-    popupCapacity.textContent = offer.offer.rooms + roomText;
-  } else if (offer.offer.rooms === undefined) {
-    popupCapacity.textContent = 'Для ' + offer.offer.guests + guestText;
   } else {
     popupCapacity.textContent = offer.offer.rooms + roomText + ' для ' + offer.offer.guests + guestText;
   }
 
   if (offer.offer.checkin === undefined && offer.offer.checkout === undefined) {
     popupTime.classList.add('hidden');
-  } else if (offer.offer.checkout === undefined) {
-    popupTime.textContent = 'Заезд после ' + offer.offer.checkin;
-  } else if (offer.offer.checkin === undefined) {
-    popupTime.textContent = 'Выезд до ' + offer.offer.checkout;
   } else {
     popupTime.textContent = 'Заезд после ' + offer.offer.checkin + ', выезд до ' + offer.offer.checkout;
   }
