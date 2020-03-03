@@ -23,14 +23,6 @@ var mock = {
   locationMaxY: 630,
 };
 
-// Объект-словарь с типами жилья
-var translate = {
-  flat: 'Квартира',
-  bungalo: 'Бунгало',
-  house: 'Дом',
-  palace: 'Дворец'
-};
-
 // Функция нахождения рандомного элемента массива
 var getRandomArrayElement = function (objects) {
   return objects[Math.floor(Math.random() * objects.length)];
@@ -108,7 +100,7 @@ var adverts = getAdverts(mock); // тут лежит массив из 8 сге�
 
 // У блока map удаляем map--faded
 var offersMap = document.querySelector('.map');
-offersMap.classList.remove('map--faded');
+// offersMap.classList.remove('map--faded');
 
 // Записываем в переменную шаблон метки объявления
 var pinTemplate = document.querySelector('#pin')
@@ -142,7 +134,7 @@ for (var i = 0; i < adverts.length; i++) {
 }
 mapPins.appendChild(pinsFragment);
 
-// Записываем в переменную шаблон карточки объявления
+/* // Записываем в переменную шаблон карточки объявления
 var cardTemplate = document.querySelector('#card')
   .content
   .querySelector('.map__card');
@@ -182,6 +174,14 @@ var mergeFeaturesAndCard = function (features, featuresContainer) {
 var declineTitle = function (number, titles) {
   var cases = [2, 0, 1, 1, 1, 2];
   return titles[(number % 100 > 4 && number % 100 < 20) ? 2 : cases[(number % 10 < 5) ? number % 10 : 5]];
+};
+
+// Объект-словарь с типами жилья
+var translate = {
+  flat: 'Квартира',
+  bungalo: 'Бунгало',
+  house: 'Дом',
+  palace: 'Дворец'
 };
 
 // Функция отрисовки карточки с объявлением
@@ -266,4 +266,4 @@ cardFragment.appendChild(getCard(adverts[0], cardElement));
 var filtersContainer = offersMap.querySelector('.map__filters-container');
 
 // Помещаем фрагмент
-offersMap.insertBefore(cardFragment, filtersContainer);
+offersMap.insertBefore(cardFragment, filtersContainer); */
