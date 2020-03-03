@@ -1,9 +1,7 @@
 'use strict';
 
-// Нахождение DOM-элемента с картой для определения координат по оси Х
-// в зависимости от размера окна
-var mapImage = document.querySelector('.map');
-var coordinates = mapImage.getBoundingClientRect();
+// Необходимые клавиши
+var MOUSE_MAIN_BUTTON = 0;
 
 // Необходимые DOM-элементы
 var offersMap = document.querySelector('.map'); // карта с объявлениями
@@ -13,10 +11,12 @@ var adForm = document.querySelector('.ad-form'); // форма объявлен�
 var adFormHeader = document.querySelector('.ad-form-header'); // заголовок формы
 var adFormElements = document.querySelectorAll('.ad-form__element'); // элементы формы
 var mapFilters = document.querySelector('.map__filters'); // форма с фильтрами
+var pinMain = document.querySelector('.map__pin--main'); // главная метка
 
-// Размеры метки
-var pinWidth = 50;
-var pinHeight = 70;
+// Нахождение DOM-элемента с картой для определения координат по оси Х
+// в зависимости от размера окна
+var mapImage = document.querySelector('.map');
+var coordinates = mapImage.getBoundingClientRect();
 
 // Данные мока
 var mock = {
@@ -35,6 +35,10 @@ var mock = {
   locationMinY: 130,
   locationMaxY: 630,
 };
+
+// Размеры метки
+var pinWidth = 50;
+var pinHeight = 70;
 
 // Функция нахождения рандомного элемента массива
 var getRandomArrayElement = function (objects) {
@@ -164,6 +168,13 @@ var activePage = function () {
   enableElements(adFormElements); // удаление атрибута disabled с элементов формы
   mapFilters.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с формы с фильтрами
 };
+
+// Обработчик активации страницы по нажатию на левую клавишу мыши
+pinMain.addEventListener('mousedown', function (evt) {
+  if (evt.button === MOUSE_MAIN_BUTTON) {
+    activePage();
+  }
+});
 
 /* // Записываем в переменную шаблон карточки объявления
 var cardTemplate = document.querySelector('#card')
