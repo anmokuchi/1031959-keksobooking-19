@@ -148,7 +148,7 @@ var cardTemplate = document.querySelector('#card')
   .querySelector('.map__card');
 
 // Функция для создания иконок с фотографиями
-var getPhotos = function (photos, photosContainer) {
+var mergePhotosAndCard = function (photos, photosContainer) {
   if (photos === undefined) {
     photosContainer.classList.add('hidden');
   } else {
@@ -165,7 +165,7 @@ var getPhotos = function (photos, photosContainer) {
 };
 
 // Функция для создания иконок дополнительных особенностей жилья
-var getFeatures = function (features, featuresContainer) {
+var mergeFeaturesAndCard = function (features, featuresContainer) {
   if (features === undefined) {
     featuresContainer.classList.add('hidden');
   } else {
@@ -249,10 +249,10 @@ var getCard = function (offer, element) {
   }
 
   popupFeatures.innerText = '';
-  getFeatures(offer.offer.features, popupFeatures);
+  mergeFeaturesAndCard(offer.offer.features, popupFeatures);
 
   popupPhotos.innerText = '';
-  getPhotos(offer.offer.photos, popupPhotos);
+  mergePhotosAndCard(offer.offer.photos, popupPhotos);
 
   return element;
 };
