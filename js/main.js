@@ -14,6 +14,13 @@ var adFormElements = document.querySelectorAll('.ad-form__element'); // элем
 var mapFilters = document.querySelector('.map__filters'); // форма с фильтрами
 var addressInput = document.querySelector('#address'); // инпут адреса
 var pinMain = document.querySelector('.map__pin--main'); // главная метка
+var formTitleInput = adForm.querySelector('#title'); // инпут заголовка жилья
+var roomsNumber = adForm.querySelector('#room_number'); // выпадающее меню количества комнат
+var guestsNumber = adForm.querySelector('#capacity'); // выпадающее меню количества гостей
+
+// Переменные для валидации
+var MIN_TITLE_LENGTH = 30;
+var MAX_TITLE_LENGTH = 100;
 
 // Нахождение DOM-элемента с картой для определения координат по оси Х
 // в зависимости от размера окна
@@ -202,6 +209,47 @@ pinMain.addEventListener('mousedown', function (evt) {
 pinMain.addEventListener('keydown', function (evt) {
   if (evt.key === ENTER_KEY) {
     activatePage();
+  }
+});
+
+// Валидация заголовка жилья
+formTitleInput.addEventListener('invalid', function () {
+  if (formTitleInput.validity.tooShort) {
+    formTitleInput.setCustomValidity('Заголовок должен состоять минимум из ' + MIN_TITLE_LENGTH + ' символов');
+  } else if (formTitleInput.validity.tooLong) {
+    formTitleInput.setCustomValidity('Заголовок не должен превышать ' + MAX_TITLE_LENGTH + 'символов');
+  } else if (formTitleInput.validity.valueMissing) {
+    formTitleInput.setCustomValidity('Обязательное поле');
+  } else {
+    formTitleInput.setCustomValidity('');
+  }
+});
+
+formTitleInput.addEventListener('input', function () {
+  if (formTitleInput.value.length < MIN_TITLE_LENGTH) {
+    formTitleInput.setCustomValidity(
+        'Заголовок должен состоять минимум из ' + MIN_TITLE_LENGTH + ' символов'
+    );
+  } else if (formTitleInput.value.length > MAX_TITLE_LENGTH) {
+    formTitleInput.setCustomValidity(
+        'Заголовок не должен превышать ' + MAX_TITLE_LENGTH + ' символов'
+    );
+  } else {
+    formTitleInput.setCustomValidity('');
+  }
+});
+
+// Валидация соответствия количества гостей (спальных мест) с количеством комнат
+adForm.addEventListener('change', function () {
+  if (roomsNumber.value < guestsNumber.value && roomsNumber.value !== '100' && guestsNumber.value !== '0') {
+    guestsNumber.setCustomValidity('Количество гостей не должно превышать количество комнат');
+  } else if (roomsNumber.value === '100' && guestsNumber.value !== '0') {
+    roomsNumber.setCustomValidity('Данное количество комнат не предназначено для гостей');
+  } else if (guestsNumber.value === '0' && roomsNumber.value !== '100') {
+    guestsNumber.setCustomValidity('Для нежилого помещения необходимо выбрать максимальное количество комнат');
+  } else {
+    roomsNumber.setCustomValidity('');
+    guestsNumber.setCustomValidity('');
   }
 });
 
