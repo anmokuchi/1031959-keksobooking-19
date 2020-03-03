@@ -12,6 +12,7 @@ var adForm = document.querySelector('.ad-form'); // форма объявлен�
 var adFormHeader = document.querySelector('.ad-form-header'); // заголовок формы
 var adFormElements = document.querySelectorAll('.ad-form__element'); // элементы формы
 var mapFilters = document.querySelector('.map__filters'); // форма с фильтрами
+var addressInput = document.querySelector('#address'); // инпут адреса
 var pinMain = document.querySelector('.map__pin--main'); // главная метка
 
 // Нахождение DOM-элемента с картой для определения координат по оси Х
@@ -37,9 +38,14 @@ var mock = {
   locationMaxY: 630,
 };
 
-// Размеры метки
-var pinWidth = 50;
-var pinHeight = 70;
+// Размеры меток
+var pinWidth = 50; // ширина обычной метки
+var pinHeight = 70; // высота обычной метки
+var PIN_MAIN_WIDTH = 62; // ширина главной метки
+var PIN_MAIN_HEIGHT = 62; // высота главной метки
+var PIN_MAIN_LEFT = parseInt(pinMain.style.left, 10); // отступ главной метки от левого края
+var PIN_MAIN_TOP = parseInt(pinMain.style.top, 10); // отступ главной метки от верха
+var PIN_MAIN_POINT_HEIGHT = 22; // высота острия метки
 
 // Функция нахождения рандомного элемента массива
 var getRandomArrayElement = function (objects) {
@@ -116,9 +122,6 @@ var getAdverts = function (options) {
 // Запись результата работы функции в переменную
 var adverts = getAdverts(mock); // тут лежит массив из 8 сгенерированных объектов
 
-// У блока map удаляем map--faded
-// offersMap.classList.remove('map--faded');
-
 // Функция отрисовки метки
 var getPin = function (offer, element, width, height) {
   var pinPosition = 'left: ' + (offer.location.x - (width / 2)) + 'px; top: ' + (offer.location.y - height) + 'px;';
@@ -155,10 +158,27 @@ var enableElements = function (elements) {
   }
 };
 
+// Функция получения координат главной метки в неактивном состоянии (координаты центра метки)
+var getMainPinCoordinatesInactive = function (left, width, top, height) {
+  var pinMainLocationX = left + width / 2;
+  var pinMainLocationY = top + height / 2;
+  return pinMainLocationX + ', ' + pinMainLocationY;
+};
+
+// Функция получения координат главной метки в активном состоянии (координаты острого конца метки)
+var getMainPinCoordinatesActive = function (left, width, top, height, pointHeight) {
+  var pinMainLocationX = left + width / 2;
+  var pinMainLocationY = top + height + pointHeight;
+  return pinMainLocationX + ', ' + pinMainLocationY;
+};
+
 // Добавление атрибута disabled для элементов fieldset (блокируются поля формы в группе)
 adFormHeader.setAttribute('disabled', 'disabled'); // для заголовка формы
 disableElements(adFormElements); // для элементов формы
 mapFilters.setAttribute('disabled', 'disabled'); // для формы с фильтрами
+
+// Заполнение поля адреса координатами центра метки в неактивном состоянии
+addressInput.value = getMainPinCoordinatesInactive(PIN_MAIN_LEFT, PIN_MAIN_WIDTH, PIN_MAIN_TOP, PIN_MAIN_HEIGHT);
 
 // Функция активации страницы
 var activatePage = function () {
@@ -168,6 +188,7 @@ var activatePage = function () {
   adFormHeader.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с заголовка формы
   enableElements(adFormElements); // удаление атрибута disabled с элементов формы
   mapFilters.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с формы с фильтрами
+  addressInput.value = getMainPinCoordinatesActive(PIN_MAIN_LEFT, PIN_MAIN_WIDTH, PIN_MAIN_TOP, PIN_MAIN_HEIGHT, PIN_MAIN_POINT_HEIGHT);
 };
 
 // Обработчик активации страницы по нажатию на левую клавишу мыши
