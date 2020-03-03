@@ -5,6 +5,17 @@
 var mapImage = document.querySelector('.map');
 var coordinates = mapImage.getBoundingClientRect();
 
+// Необходимые DOM-элементы
+var offersMap = document.querySelector('.map'); // карта с объявлениями
+var pinTemplate = document.querySelector('#pin').content.querySelector('button'); // шаблон метки объявления
+var mapPins = document.querySelector('.map__pins'); // элемент, куда добавлять метки объявлений
+var adFormHeader = document.querySelector('.ad-form-header'); // заголовок формы
+var adFormElements = document.querySelectorAll('.ad-form__element'); // элементы формы
+
+// Размеры метки
+var pinWidth = 50;
+var pinHeight = 70;
+
 // Данные мока
 var mock = {
   offersAmount: 8,
@@ -95,24 +106,11 @@ var getAdverts = function (options) {
   return offers;
 };
 
-// Записываем результат работы функции в переменную
+// Запись результата работы функции в переменную
 var adverts = getAdverts(mock); // тут лежит массив из 8 сгенерированных объектов
 
 // У блока map удаляем map--faded
-var offersMap = document.querySelector('.map');
 // offersMap.classList.remove('map--faded');
-
-// Записываем в переменную шаблон метки объявления
-var pinTemplate = document.querySelector('#pin')
-  .content
-  .querySelector('button');
-
-// Размеры метки
-var pinWidth = 50;
-var pinHeight = 70;
-
-// Находим элемент, куда добавлять метки объявлений
-var mapPins = document.querySelector('.map__pins');
 
 // Функция отрисовки метки
 var getPin = function (offer, element, width, height) {
@@ -133,6 +131,14 @@ for (var i = 0; i < adverts.length; i++) {
   pinsFragment.appendChild(getPin(adverts[i], pinElement, pinWidth, pinHeight));
 }
 mapPins.appendChild(pinsFragment);
+
+// Добавление атрибута disabled для элементов fieldset (блокируются поля формы в группе)
+adFormHeader.setAttribute('disabled', 'disabled'); // для заголовка формы
+
+for (var l = 0; l < adFormElements.length; l++) { // для элементов формы
+  var adFormElement = adFormElements[l];
+  adFormElement.setAttribute('disabled', 'disabled');
+}
 
 /* // Записываем в переменную шаблон карточки объявления
 var cardTemplate = document.querySelector('#card')
