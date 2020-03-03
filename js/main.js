@@ -1,7 +1,8 @@
 'use strict';
 
 // Необходимые клавиши
-var MOUSE_MAIN_BUTTON = 0;
+var MOUSE_MAIN_BUTTON = 0; // Левая кнопка мыши
+var ENTER_KEY = 'Enter';
 
 // Необходимые DOM-элементы
 var offersMap = document.querySelector('.map'); // карта с объявлениями
@@ -160,7 +161,7 @@ disableElements(adFormElements); // для элементов формы
 mapFilters.setAttribute('disabled', 'disabled'); // для формы с фильтрами
 
 // Функция активации страницы
-var activePage = function () {
+var activatePage = function () {
   offersMap.classList.remove('map--faded'); // удаление класса map--faded у карты с объявлениями для ее активации
   adForm.classList.remove('ad-form--disabled'); // удаление класса ad-form--disabled у формы объявления для ее активации
   getPins(); // вызов функции добавления меток
@@ -172,7 +173,14 @@ var activePage = function () {
 // Обработчик активации страницы по нажатию на левую клавишу мыши
 pinMain.addEventListener('mousedown', function (evt) {
   if (evt.button === MOUSE_MAIN_BUTTON) {
-    activePage();
+    activatePage();
+  }
+});
+
+// Обработчик активации страницы по нажатию на Enter
+pinMain.addEventListener('keydown', function (evt) {
+  if (evt.key === ENTER_KEY) {
+    activatePage();
   }
 });
 
