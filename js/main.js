@@ -244,9 +244,9 @@ adForm.addEventListener('change', function () {
   if (roomsNumber.value < guestsNumber.value && roomsNumber.value !== '100' && guestsNumber.value !== '0') {
     guestsNumber.setCustomValidity('Количество гостей не должно превышать количество комнат');
   } else if (roomsNumber.value === '100' && guestsNumber.value !== '0') {
-    roomsNumber.setCustomValidity('Данное количество комнат не предназначено для гостей');
+    guestsNumber.setCustomValidity('Данное количество комнат не предназначено для гостей');
   } else if (guestsNumber.value === '0' && roomsNumber.value !== '100') {
-    guestsNumber.setCustomValidity('Для нежилого помещения необходимо выбрать максимальное количество комнат');
+    roomsNumber.setCustomValidity('Для нежилого помещения необходимо выбрать максимальное количество комнат');
   } else {
     roomsNumber.setCustomValidity('');
     guestsNumber.setCustomValidity('');
