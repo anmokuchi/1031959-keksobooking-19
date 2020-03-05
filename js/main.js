@@ -1,8 +1,5 @@
 'use strict';
 
-// Необходимые клавиши
-var ENTER_KEY = 'Enter';
-
 // Необходимые DOM-элементы
 var offersMap = document.querySelector('.map'); // карта с объявлениями
 var pinTemplate = document.querySelector('#pin').content.querySelector('button'); // шаблон метки объявления
@@ -206,7 +203,7 @@ pinMain.addEventListener('mousedown', function (evt) {
 
 // Обработчик активации страницы по нажатию на Enter
 pinMain.addEventListener('keydown', function (evt) {
-  if (evt.key === ENTER_KEY) {
+  if (evt.key === 'Enter') {
     activatePage();
   }
 });
