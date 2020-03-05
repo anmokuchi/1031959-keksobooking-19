@@ -1,5 +1,17 @@
 'use strict';
 
+// Необходимые DOM-элементы
+var offersMap = document.querySelector('.map'); // карта с объявлениями
+var pinTemplate = document.querySelector('#pin').content.querySelector('button'); // шаблон метки объявления
+var mapPins = document.querySelector('.map__pins'); // элемент, куда добавлять метки объявлений
+var adForm = document.querySelector('.ad-form'); // форма объявления
+var adFormHeader = document.querySelector('.ad-form-header'); // заголовок формы
+var adFormElements = document.querySelectorAll('.ad-form__element'); // элементы формы
+var mapFilters = document.querySelector('.map__filters'); // форма с фильтрами
+var addressInput = document.querySelector('#address'); // инпут адреса
+var roomsNumber = adForm.querySelector('#room_number'); // выпадающее меню количества комнат
+var guestsNumber = adForm.querySelector('#capacity'); // выпадающее меню количества гостей
+
 // Нахождение DOM-элемента с картой для определения координат по оси Х
 // в зависимости от размера окна
 var mapImage = document.querySelector('.map');
@@ -23,12 +35,15 @@ var mock = {
   locationMaxY: 630,
 };
 
-// Объект-словарь с типами жилья
-var translate = {
-  flat: 'Квартира',
-  bungalo: 'Бунгало',
-  house: 'Дом',
-  palace: 'Дворец'
+// Размеры меток
+var pinWidth = 50; // ширина обычной метки
+var pinHeight = 70; // высота обычной метки
+
+var pinMain = {
+  element: document.querySelector('.map__pin--main'),
+  width: 65,
+  height: 65,
+  pointHeight: 15,
 };
 
 // Функция нахождения рандомного элемента массива
@@ -103,24 +118,8 @@ var getAdverts = function (options) {
   return offers;
 };
 
-// Записываем результат работы функции в переменную
+// Запись результата работы функции в переменную
 var adverts = getAdverts(mock); // тут лежит массив из 8 сгенерированных объектов
-
-// У блока map удаляем map--faded
-var offersMap = document.querySelector('.map');
-offersMap.classList.remove('map--faded');
-
-// Записываем в переменную шаблон метки объявления
-var pinTemplate = document.querySelector('#pin')
-  .content
-  .querySelector('button');
-
-// Размеры метки
-var pinWidth = 50;
-var pinHeight = 70;
-
-// Находим элемент, куда добавлять метки объявлений
-var mapPins = document.querySelector('.map__pins');
 
 // Функция отрисовки метки
 var getPin = function (offer, element, width, height) {
@@ -133,22 +132,89 @@ var getPin = function (offer, element, width, height) {
   return element;
 };
 
-// Цикл добавления меток во фрагмент и затем на страницу
-var pinsFragment = document.createDocumentFragment();
-for (var i = 0; i < adverts.length; i++) {
-  var pinElement = pinTemplate.cloneNode(true);
-  offersMap.appendChild(pinElement);
-  pinsFragment.appendChild(getPin(adverts[i], pinElement, pinWidth, pinHeight));
-}
-mapPins.appendChild(pinsFragment);
+// Функция добавления меток во фрагмент и затем на страницу
+var getPins = function () {
+  var pinsFragment = document.createDocumentFragment();
+  for (var i = 0; i < adverts.length; i++) {
+    var pinElement = pinTemplate.cloneNode(true);
+    offersMap.appendChild(pinElement);
+    pinsFragment.appendChild(getPin(adverts[i], pinElement, pinWidth, pinHeight));
+  }
+  mapPins.appendChild(pinsFragment);
+};
 
-// Записываем в переменную шаблон карточки объявления
+// Функция получения координат главной метки
+var getMainPinCoordinatesValue = function (pin, isActive) {
+  var left = parseInt(pin.element.style.left, 10);
+  var top = parseInt(pin.element.style.top, 10);
+  var pinMainLocationX = left + pin.width / 2;
+  var pinMainLocationY;
+  if (!isActive) {
+    pinMainLocationY = top + pin.height / 2;
+  } else {
+    pinMainLocationY = top + pin.height + pin.pointHeight;
+  }
+  return Math.round(pinMainLocationX) + ', ' + Math.round(pinMainLocationY);
+};
+
+// Добавление атрибута disabled для элементов fieldset (блокируются поля формы в группе)
+adFormHeader.setAttribute('disabled', 'disabled'); // для заголовка формы
+mapFilters.setAttribute('disabled', 'disabled'); // для формы с фильтрами
+adFormElements.forEach(function (element) { // для всех элементов формы
+  element.setAttribute('disabled', 'disabled');
+});
+
+// Заполнение поля адреса координатами центра метки в неактивном состоянии
+addressInput.value = getMainPinCoordinatesValue(pinMain, false);
+
+// Функция активации страницы
+var activatePage = function () {
+  offersMap.classList.remove('map--faded'); // удаление класса map--faded у карты с объявлениями для ее активации
+  adForm.classList.remove('ad-form--disabled'); // удаление класса ad-form--disabled у формы объявления для ее активации
+  getPins(); // вызов функции добавления меток
+  adFormHeader.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с заголовка формы
+  mapFilters.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с формы с фильтрами
+  addressInput.value = getMainPinCoordinatesValue(pinMain, true);
+  adFormElements.forEach(function (element) { // удаление атрибута disabled с элементов формы
+    element.removeAttribute('disabled', 'disabled');
+  });
+};
+
+// Обработчик активации страницы по нажатию на левую клавишу мыши
+pinMain.element.addEventListener('mousedown', function (evt) {
+  if (evt.button === 0) {
+    activatePage();
+  }
+});
+
+// Обработчик активации страницы по нажатию на Enter
+pinMain.element.addEventListener('keydown', function (evt) {
+  if (evt.key === 'Enter') {
+    activatePage();
+  }
+});
+
+// Валидация соответствия количества гостей (спальных мест) с количеством комнат
+adForm.addEventListener('change', function () {
+  if (roomsNumber.value < guestsNumber.value && roomsNumber.value !== '100' && guestsNumber.value !== '0') {
+    guestsNumber.setCustomValidity('Количество гостей не должно превышать количество комнат');
+  } else if (roomsNumber.value === '100' && guestsNumber.value !== '0') {
+    guestsNumber.setCustomValidity('Данное количество комнат не предназначено для гостей');
+  } else if (guestsNumber.value === '0' && roomsNumber.value !== '100') {
+    roomsNumber.setCustomValidity('Для нежилого помещения необходимо выбрать максимальное количество комнат');
+  } else {
+    roomsNumber.setCustomValidity('');
+    guestsNumber.setCustomValidity('');
+  }
+});
+
+/* // Записываем в переменную шаблон карточки объявления
 var cardTemplate = document.querySelector('#card')
   .content
   .querySelector('.map__card');
 
 // Функция для создания иконок с фотографиями
-var getPhotos = function (photos, photosContainer) {
+var mergePhotosAndCard = function (photos, photosContainer) {
   if (photos === undefined) {
     photosContainer.classList.add('hidden');
   } else {
@@ -165,7 +231,7 @@ var getPhotos = function (photos, photosContainer) {
 };
 
 // Функция для создания иконок дополнительных особенностей жилья
-var getFeatures = function (features, featuresContainer) {
+var mergeFeaturesAndCard = function (features, featuresContainer) {
   if (features === undefined) {
     featuresContainer.classList.add('hidden');
   } else {
@@ -182,6 +248,14 @@ var getFeatures = function (features, featuresContainer) {
 var declineTitle = function (number, titles) {
   var cases = [2, 0, 1, 1, 1, 2];
   return titles[(number % 100 > 4 && number % 100 < 20) ? 2 : cases[(number % 10 < 5) ? number % 10 : 5]];
+};
+
+// Объект-словарь с типами жилья
+var translate = {
+  flat: 'Квартира',
+  bungalo: 'Бунгало',
+  house: 'Дом',
+  palace: 'Дворец'
 };
 
 // Функция отрисовки карточки с объявлением
@@ -249,10 +323,10 @@ var getCard = function (offer, element) {
   }
 
   popupFeatures.innerText = '';
-  getFeatures(offer.offer.features, popupFeatures);
+  mergeFeaturesAndCard(offer.offer.features, popupFeatures);
 
   popupPhotos.innerText = '';
-  getPhotos(offer.offer.photos, popupPhotos);
+  mergePhotosAndCard(offer.offer.photos, popupPhotos);
 
   return element;
 };
@@ -266,4 +340,4 @@ cardFragment.appendChild(getCard(adverts[0], cardElement));
 var filtersContainer = offersMap.querySelector('.map__filters-container');
 
 // Помещаем фрагмент
-offersMap.insertBefore(cardFragment, filtersContainer);
+offersMap.insertBefore(cardFragment, filtersContainer); */
