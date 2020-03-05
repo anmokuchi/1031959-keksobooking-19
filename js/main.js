@@ -143,21 +143,7 @@ var getPins = function () {
   mapPins.appendChild(pinsFragment);
 };
 
-// Функция дезактивации массива элементов
-var disableElements = function (elements) {
-  for (var i = 0; i < elements.length; i++) {
-    elements[i].setAttribute('disabled', 'disabled');
-  }
-};
-
-// Функция активации массива элементов
-var enableElements = function (elements) {
-  for (var i = 0; i < elements.length; i++) {
-    elements[i].removeAttribute('disabled', 'disabled');
-  }
-};
-
-// Функция получения координат главной метки в неактивном состоянии (координаты центра метки)
+// Функция получения координат главной метки
 var getMainPinCoordinatesValue = function (pin, isActive) {
   var left = parseInt(pin.element.style.left, 10);
   var top = parseInt(pin.element.style.top, 10);
@@ -173,8 +159,10 @@ var getMainPinCoordinatesValue = function (pin, isActive) {
 
 // Добавление атрибута disabled для элементов fieldset (блокируются поля формы в группе)
 adFormHeader.setAttribute('disabled', 'disabled'); // для заголовка формы
-disableElements(adFormElements); // для элементов формы
 mapFilters.setAttribute('disabled', 'disabled'); // для формы с фильтрами
+adFormElements.forEach(function (element) { // для всех элементов формы
+  element.setAttribute('disabled', 'disabled');
+});
 
 // Заполнение поля адреса координатами центра метки в неактивном состоянии
 addressInput.value = getMainPinCoordinatesValue(pinMain, false);
@@ -185,9 +173,11 @@ var activatePage = function () {
   adForm.classList.remove('ad-form--disabled'); // удаление класса ad-form--disabled у формы объявления для ее активации
   getPins(); // вызов функции добавления меток
   adFormHeader.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с заголовка формы
-  enableElements(adFormElements); // удаление атрибута disabled с элементов формы
   mapFilters.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с формы с фильтрами
   addressInput.value = getMainPinCoordinatesValue(pinMain, true);
+  adFormElements.forEach(function (element) { // удаление атрибута disabled с элементов формы
+    element.removeAttribute('disabled', 'disabled');
+  });
 };
 
 // Обработчик активации страницы по нажатию на левую клавишу мыши
