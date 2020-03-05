@@ -1,7 +1,6 @@
 'use strict';
 
 // Необходимые клавиши
-var MOUSE_MAIN_BUTTON = 0; // Левая кнопка мыши
 var ENTER_KEY = 'Enter';
 
 // Необходимые DOM-элементы
@@ -200,7 +199,7 @@ var activatePage = function () {
 
 // Обработчик активации страницы по нажатию на левую клавишу мыши
 pinMain.addEventListener('mousedown', function (evt) {
-  if (evt.button === MOUSE_MAIN_BUTTON) {
+  if (evt.button === 0) {
     activatePage();
   }
 });
