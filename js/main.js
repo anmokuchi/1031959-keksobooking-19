@@ -426,3 +426,15 @@ adForm.addEventListener('change', function () {
     guestsNumber.setCustomValidity('');
   }
 });
+
+// Синхронизация времени въезда и времени выезда
+var onCheckInTimeChange = function () {
+  timeOut.value = timeIn.value;
+};
+
+var onCheckOutTimeChange = function () {
+  timeIn.value = timeOut.value;
+};
+
+timeIn.addEventListener('change', onCheckInTimeChange);
+timeOut.addEventListener('change', onCheckOutTimeChange);
