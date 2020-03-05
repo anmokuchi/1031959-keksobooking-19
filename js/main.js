@@ -44,6 +44,14 @@ var mock = {
 // Размеры меток
 var pinWidth = 50; // ширина обычной метки
 var pinHeight = 70; // высота обычной метки
+
+var pinMainSize = {
+  width: 62,
+  height: 62,
+  left: parseInt(pinMain.style.left, 10),
+  top: parseInt(pinMain.style.top, 10),
+  pointHeight: 22,
+};
 var PIN_MAIN_WIDTH = 62; // ширина главной метки
 var PIN_MAIN_HEIGHT = 62; // высота главной метки
 var PIN_MAIN_LEFT = parseInt(pinMain.style.left, 10); // отступ главной метки от левого края
@@ -162,16 +170,16 @@ var enableElements = function (elements) {
 };
 
 // Функция получения координат главной метки в неактивном состоянии (координаты центра метки)
-var getMainPinCoordinatesInactive = function (left, width, top, height) {
-  var pinMainLocationX = left + width / 2;
-  var pinMainLocationY = top + height / 2;
+var getMainPinCoordinatesInactive = function (element) {
+  var pinMainLocationX = element.left + element.width / 2;
+  var pinMainLocationY = element.top + element.height / 2;
   return pinMainLocationX + ', ' + pinMainLocationY;
 };
 
 // Функция получения координат главной метки в активном состоянии (координаты острого конца метки)
-var getMainPinCoordinatesActive = function (left, width, top, height, pointHeight) {
-  var pinMainLocationX = left + width / 2;
-  var pinMainLocationY = top + height + pointHeight;
+var getMainPinCoordinatesActive = function (element) {
+  var pinMainLocationX = element.left + element.width / 2;
+  var pinMainLocationY = element.top + element.height + element.pointHeight;
   return pinMainLocationX + ', ' + pinMainLocationY;
 };
 
@@ -181,7 +189,7 @@ disableElements(adFormElements); // для элементов формы
 mapFilters.setAttribute('disabled', 'disabled'); // для формы с фильтрами
 
 // Заполнение поля адреса координатами центра метки в неактивном состоянии
-addressInput.value = getMainPinCoordinatesInactive(PIN_MAIN_LEFT, PIN_MAIN_WIDTH, PIN_MAIN_TOP, PIN_MAIN_HEIGHT);
+addressInput.value = getMainPinCoordinatesInactive(pinMainSize);
 
 // Функция активации страницы
 var activatePage = function () {
@@ -191,7 +199,7 @@ var activatePage = function () {
   adFormHeader.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с заголовка формы
   enableElements(adFormElements); // удаление атрибута disabled с элементов формы
   mapFilters.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с формы с фильтрами
-  addressInput.value = getMainPinCoordinatesActive(PIN_MAIN_LEFT, PIN_MAIN_WIDTH, PIN_MAIN_TOP, PIN_MAIN_HEIGHT, PIN_MAIN_POINT_HEIGHT);
+  addressInput.value = getMainPinCoordinatesActive(pinMainSize);
 };
 
 // Обработчик активации страницы по нажатию на левую клавишу мыши
