@@ -9,14 +9,8 @@ var adFormHeader = document.querySelector('.ad-form-header'); // заголов�
 var adFormElements = document.querySelectorAll('.ad-form__element'); // элементы формы
 var mapFilters = document.querySelector('.map__filters'); // форма с фильтрами
 var addressInput = document.querySelector('#address'); // инпут адреса
-var pinMain = document.querySelector('.map__pin--main'); // главная метка
-var formTitleInput = adForm.querySelector('#title'); // инпут заголовка жилья
 var roomsNumber = adForm.querySelector('#room_number'); // выпадающее меню количества комнат
 var guestsNumber = adForm.querySelector('#capacity'); // выпадающее меню количества гостей
-
-// Переменные для валидации
-var MIN_TITLE_LENGTH = 30;
-var MAX_TITLE_LENGTH = 100;
 
 // Нахождение DOM-элемента с картой для определения координат по оси Х
 // в зависимости от размера окна
@@ -45,18 +39,12 @@ var mock = {
 var pinWidth = 50; // ширина обычной метки
 var pinHeight = 70; // высота обычной метки
 
-var pinMainSize = {
-  width: 62,
-  height: 62,
-  left: parseInt(pinMain.style.left, 10),
-  top: parseInt(pinMain.style.top, 10),
-  pointHeight: 22,
+var pinMain = {
+  element: document.querySelector('.map__pin--main'),
+  width: 65,
+  height: 65,
+  pointHeight: 15,
 };
-var PIN_MAIN_WIDTH = 62; // ширина главной метки
-var PIN_MAIN_HEIGHT = 62; // высота главной метки
-var PIN_MAIN_LEFT = parseInt(pinMain.style.left, 10); // отступ главной метки от левого края
-var PIN_MAIN_TOP = parseInt(pinMain.style.top, 10); // отступ главной метки от верха
-var PIN_MAIN_POINT_HEIGHT = 22; // высота острия метки
 
 // Функция нахождения рандомного элемента массива
 var getRandomArrayElement = function (objects) {
@@ -170,17 +158,17 @@ var enableElements = function (elements) {
 };
 
 // Функция получения координат главной метки в неактивном состоянии (координаты центра метки)
-var getMainPinCoordinatesInactive = function (element) {
-  var pinMainLocationX = element.left + element.width / 2;
-  var pinMainLocationY = element.top + element.height / 2;
-  return pinMainLocationX + ', ' + pinMainLocationY;
-};
-
-// Функция получения координат главной метки в активном состоянии (координаты острого конца метки)
-var getMainPinCoordinatesActive = function (element) {
-  var pinMainLocationX = element.left + element.width / 2;
-  var pinMainLocationY = element.top + element.height + element.pointHeight;
-  return pinMainLocationX + ', ' + pinMainLocationY;
+var getMainPinCoordinatesValue = function (pin, isActive) {
+  var left = parseInt(pin.element.style.left, 10);
+  var top = parseInt(pin.element.style.top, 10);
+  var pinMainLocationX = left + pin.width / 2;
+  var pinMainLocationY;
+  if (!isActive) {
+    pinMainLocationY = top + pin.height / 2;
+  } else {
+    pinMainLocationY = top + pin.height + pin.pointHeight;
+  }
+  return Math.round(pinMainLocationX) + ', ' + Math.round(pinMainLocationY);
 };
 
 // Добавление атрибута disabled для элементов fieldset (блокируются поля формы в группе)
@@ -189,7 +177,7 @@ disableElements(adFormElements); // для элементов формы
 mapFilters.setAttribute('disabled', 'disabled'); // для формы с фильтрами
 
 // Заполнение поля адреса координатами центра метки в неактивном состоянии
-addressInput.value = getMainPinCoordinatesInactive(pinMainSize);
+addressInput.value = getMainPinCoordinatesValue(pinMain, false);
 
 // Функция активации страницы
 var activatePage = function () {
@@ -199,47 +187,20 @@ var activatePage = function () {
   adFormHeader.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с заголовка формы
   enableElements(adFormElements); // удаление атрибута disabled с элементов формы
   mapFilters.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с формы с фильтрами
-  addressInput.value = getMainPinCoordinatesActive(pinMainSize);
+  addressInput.value = getMainPinCoordinatesValue(pinMain, true);
 };
 
 // Обработчик активации страницы по нажатию на левую клавишу мыши
-pinMain.addEventListener('mousedown', function (evt) {
+pinMain.element.addEventListener('mousedown', function (evt) {
   if (evt.button === 0) {
     activatePage();
   }
 });
 
 // Обработчик активации страницы по нажатию на Enter
-pinMain.addEventListener('keydown', function (evt) {
+pinMain.element.addEventListener('keydown', function (evt) {
   if (evt.key === 'Enter') {
     activatePage();
-  }
-});
-
-// Валидация заголовка жилья
-formTitleInput.addEventListener('invalid', function () {
-  if (formTitleInput.validity.tooShort) {
-    formTitleInput.setCustomValidity('Заголовок должен состоять минимум из ' + MIN_TITLE_LENGTH + ' символов');
-  } else if (formTitleInput.validity.tooLong) {
-    formTitleInput.setCustomValidity('Заголовок не должен превышать ' + MAX_TITLE_LENGTH + 'символов');
-  } else if (formTitleInput.validity.valueMissing) {
-    formTitleInput.setCustomValidity('Обязательное поле');
-  } else {
-    formTitleInput.setCustomValidity('');
-  }
-});
-
-formTitleInput.addEventListener('input', function () {
-  if (formTitleInput.value.length < MIN_TITLE_LENGTH) {
-    formTitleInput.setCustomValidity(
-        'Заголовок должен состоять минимум из ' + MIN_TITLE_LENGTH + ' символов'
-    );
-  } else if (formTitleInput.value.length > MAX_TITLE_LENGTH) {
-    formTitleInput.setCustomValidity(
-        'Заголовок не должен превышать ' + MAX_TITLE_LENGTH + ' символов'
-    );
-  } else {
-    formTitleInput.setCustomValidity('');
   }
 });
 
