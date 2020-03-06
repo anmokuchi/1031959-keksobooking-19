@@ -1,5 +1,7 @@
 'use strict';
 
+/* ------------------------------ НЕОБХОДИМЫЕ ДАННЫЕ ------------------------------ */
+
 // Необходимые DOM-элементы
 var offersMap = document.querySelector('.map'); // карта с объявлениями
 var pinTemplate = document.querySelector('#pin').content.querySelector('button'); // шаблон метки объявления
@@ -11,6 +13,12 @@ var mapFilters = document.querySelector('.map__filters'); // форма с фи�
 var addressInput = document.querySelector('#address'); // инпут адреса
 var roomsNumber = adForm.querySelector('#room_number'); // выпадающее меню количества комнат
 var guestsNumber = adForm.querySelector('#capacity'); // выпадающее меню количества гостей
+var cardTemplate = document.querySelector('#card').content.querySelector('.map__card'); // шаблон карточки объявления
+var mapFiltersContainer = offersMap.querySelector('.map__filters-container'); // контейнер с фильтрами на карте
+var formPriceInput = adForm.querySelector('#price'); // инпут цены
+var houseType = document.querySelector('#type'); // выпадающее меню типа жилья
+var timeIn = adForm.querySelector('#timein'); // выпадающее меню времени заезда
+var timeOut = adForm.querySelector('#timeout'); // выпадающее меню времени выезда
 
 // Нахождение DOM-элемента с картой для определения координат по оси Х
 // в зависимости от размера окна
@@ -39,12 +47,14 @@ var mock = {
 var pinWidth = 50; // ширина обычной метки
 var pinHeight = 70; // высота обычной метки
 
-var pinMain = {
+var pinMain = {// главная метка
   element: document.querySelector('.map__pin--main'),
   width: 65,
   height: 65,
   pointHeight: 15,
 };
+
+/* ------------------------------ ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ МЕТОК ------------------------------ */
 
 // Функция нахождения рандомного элемента массива
 var getRandomArrayElement = function (objects) {
@@ -73,6 +83,8 @@ var getRandomArray = function (options) {
   var optionsCopyRandom = shuffleArray(optionsCopy);
   return optionsCopyRandom.slice(getRandomIntInclusive(0, optionsCopyRandom.length));
 };
+
+/* ------------------------------ ГЕНЕРАЦИЯ И ОТРИСОВКА МЕТОК ------------------------------ */
 
 // Функция генерации массива с объектами
 var getAdverts = function (options) {
@@ -143,75 +155,7 @@ var getPins = function () {
   mapPins.appendChild(pinsFragment);
 };
 
-// Функция получения координат главной метки
-var getMainPinCoordinatesValue = function (pin, isActive) {
-  var left = parseInt(pin.element.style.left, 10);
-  var top = parseInt(pin.element.style.top, 10);
-  var pinMainLocationX = left + pin.width / 2;
-  var pinMainLocationY;
-  if (!isActive) {
-    pinMainLocationY = top + pin.height / 2;
-  } else {
-    pinMainLocationY = top + pin.height + pin.pointHeight;
-  }
-  return Math.round(pinMainLocationX) + ', ' + Math.round(pinMainLocationY);
-};
-
-// Добавление атрибута disabled для элементов fieldset (блокируются поля формы в группе)
-adFormHeader.setAttribute('disabled', 'disabled'); // для заголовка формы
-mapFilters.setAttribute('disabled', 'disabled'); // для формы с фильтрами
-adFormElements.forEach(function (element) { // для всех элементов формы
-  element.setAttribute('disabled', 'disabled');
-});
-
-// Заполнение поля адреса координатами центра метки в неактивном состоянии
-addressInput.value = getMainPinCoordinatesValue(pinMain, false);
-
-// Функция активации страницы
-var activatePage = function () {
-  offersMap.classList.remove('map--faded'); // удаление класса map--faded у карты с объявлениями для ее активации
-  adForm.classList.remove('ad-form--disabled'); // удаление класса ad-form--disabled у формы объявления для ее активации
-  getPins(); // вызов функции добавления меток
-  adFormHeader.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с заголовка формы
-  mapFilters.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с формы с фильтрами
-  addressInput.value = getMainPinCoordinatesValue(pinMain, true);
-  adFormElements.forEach(function (element) { // удаление атрибута disabled с элементов формы
-    element.removeAttribute('disabled', 'disabled');
-  });
-};
-
-// Обработчик активации страницы по нажатию на левую клавишу мыши
-pinMain.element.addEventListener('mousedown', function (evt) {
-  if (evt.button === 0) {
-    activatePage();
-  }
-});
-
-// Обработчик активации страницы по нажатию на Enter
-pinMain.element.addEventListener('keydown', function (evt) {
-  if (evt.key === 'Enter') {
-    activatePage();
-  }
-});
-
-// Валидация соответствия количества гостей (спальных мест) с количеством комнат
-adForm.addEventListener('change', function () {
-  if (roomsNumber.value < guestsNumber.value && roomsNumber.value !== '100' && guestsNumber.value !== '0') {
-    guestsNumber.setCustomValidity('Количество гостей не должно превышать количество комнат');
-  } else if (roomsNumber.value === '100' && guestsNumber.value !== '0') {
-    guestsNumber.setCustomValidity('Данное количество комнат не предназначено для гостей');
-  } else if (guestsNumber.value === '0' && roomsNumber.value !== '100') {
-    roomsNumber.setCustomValidity('Для нежилого помещения необходимо выбрать максимальное количество комнат');
-  } else {
-    roomsNumber.setCustomValidity('');
-    guestsNumber.setCustomValidity('');
-  }
-});
-
-/* // Записываем в переменную шаблон карточки объявления
-var cardTemplate = document.querySelector('#card')
-  .content
-  .querySelector('.map__card');
+/* ------------------------------ ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ КАРТОЧЕК ------------------------------ */
 
 // Функция для создания иконок с фотографиями
 var mergePhotosAndCard = function (photos, photosContainer) {
@@ -258,6 +202,8 @@ var translate = {
   palace: 'Дворец'
 };
 
+/* ------------------------------ ГЕНЕРАЦИЯ И ОБРАБОТЧИКИ КАРТОЧЕК ------------------------------ */
+
 // Функция отрисовки карточки с объявлением
 var getCard = function (offer, element) {
   var roomText = declineTitle(offer.offer.rooms, [' комната', ' комнаты', ' комнат']);
@@ -289,7 +235,7 @@ var getCard = function (offer, element) {
   if (offer.offer.price === undefined) {
     popupPrice.classList.add('hidden');
   } else {
-    popupPrice.textContent = offer.offer.price + '₽/ночь';
+    popupPrice.textContent = offer.offer.price + ' ₽/ночь';
   }
 
   if (offer.offer.type === undefined) {
@@ -331,13 +277,164 @@ var getCard = function (offer, element) {
   return element;
 };
 
-// Добавляем карточку с объявлением во фрагмент по шаблону
-var cardElement = cardTemplate.cloneNode(true);
-var cardFragment = document.createDocumentFragment();
-cardFragment.appendChild(getCard(adverts[0], cardElement));
 
-// Записываем в переменную элемент, перед которым поместить фрагмент
-var filtersContainer = offersMap.querySelector('.map__filters-container');
+// Обработчик открытия карточки по клику по метке
+var pinClickHandler = function () {
+  var userPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+  userPins.forEach(function (element, i) {
+    element.addEventListener('click', function () {
+      var popup = document.querySelector('.popup');
+      if (popup) {
+        popup.remove();
+      }
+      var cardElement = cardTemplate.cloneNode(true);
+      var cardsFragment = document.createDocumentFragment();
+      cardsFragment.appendChild(getCard(adverts[i], cardElement));
+      offersMap.insertBefore(cardsFragment, mapFiltersContainer);
+      closePopup();
+    });
+  });
+};
 
-// Помещаем фрагмент
-offersMap.insertBefore(cardFragment, filtersContainer); */
+// Обработчик открытия карточки по нажатию на Enter (на пробел почему-то тоже реагирует)
+var pinEnterPressHandler = function () {
+  var userPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+  userPins.forEach(function (element, i) {
+    element.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Enter') {
+        var popup = document.querySelector('.popup');
+        if (popup) {
+          popup.remove();
+        }
+        var cardElement = cardTemplate.cloneNode(true);
+        var cardsFragment = document.createDocumentFragment();
+        cardsFragment.appendChild(getCard(adverts[i], cardElement));
+        offersMap.insertBefore(cardsFragment, mapFiltersContainer);
+        closePopup();
+      }
+    });
+  });
+};
+
+// Обработчик закрытия карточки по клику или нажатию на Enter/ESC (почему-то реагирует и на пробел)
+var closePopup = function () {
+  var popup = document.querySelector('.popup');
+  var popupClose = popup.querySelector('.popup__close');
+
+  popupClose.addEventListener('click', function () {
+    popup.remove();
+  });
+
+  popupClose.addEventListener('keydown', function (evt) {
+    if (evt.key === 'Enter') {
+      popup.remove();
+    }
+  });
+
+  document.addEventListener('keydown', function (evt) {
+    if (evt.key === 'Escape') {
+      popup.remove();
+    }
+  });
+};
+
+/* ------------------------------ ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ СОСТОЯНИЯ СТРАНИЦЫ ------------------------------ */
+
+// Функция получения координат главной метки
+var getMainPinCoordinatesValue = function (pin, isActive) {
+  var left = parseInt(pin.element.style.left, 10);
+  var top = parseInt(pin.element.style.top, 10);
+  var pinMainLocationX = left + pin.width / 2;
+  var pinMainLocationY;
+  if (!isActive) {
+    pinMainLocationY = top + pin.height / 2;
+  } else {
+    pinMainLocationY = top + pin.height + pin.pointHeight;
+  }
+  return Math.round(pinMainLocationX) + ', ' + Math.round(pinMainLocationY);
+};
+
+/* ------------------------------ НЕАКТИВНОЕ СОСТОЯНИЕ СТРАНИЦЫ ------------------------------ */
+
+// Добавление атрибута disabled для элементов fieldset (блокируются поля формы в группе)
+adFormHeader.setAttribute('disabled', 'disabled'); // для заголовка формы
+mapFilters.setAttribute('disabled', 'disabled'); // для формы с фильтрами
+adFormElements.forEach(function (element) { // для всех элементов формы
+  element.setAttribute('disabled', 'disabled');
+});
+
+// Заполнение поля адреса координатами центра метки в неактивном состоянии
+addressInput.value = getMainPinCoordinatesValue(pinMain, false);
+
+/* ------------------------------ АКТИВАЦИЯ И ОБРАБОТЧИКИ ------------------------------ */
+
+// Функция активации страницы
+var activatePage = function () {
+  offersMap.classList.remove('map--faded'); // удаление класса map--faded у карты с объявлениями для ее активации
+  adForm.classList.remove('ad-form--disabled'); // удаление класса ad-form--disabled у формы объявления для ее активации
+  getPins(); // вызов функции добавления меток
+  pinClickHandler(); // обработчик по клику по метке
+  pinEnterPressHandler(); // обработчик по нажатию на метку
+  addressInput.value = getMainPinCoordinatesValue(pinMain, true); // получение координат метки
+  adFormHeader.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с заголовка формы
+  mapFilters.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с формы с фильтрами
+  adFormElements.forEach(function (element) { // удаление атрибута disabled с элементов формы
+    element.removeAttribute('disabled', 'disabled');
+  });
+};
+
+// Обработчик активации страницы по нажатию на левую клавишу мыши
+pinMain.element.addEventListener('mousedown', function (evt) {
+  if (evt.button === 0) {
+    activatePage();
+  }
+});
+
+// Обработчик активации страницы по нажатию на Enter
+pinMain.element.addEventListener('keydown', function (evt) {
+  if (evt.key === 'Enter') {
+    activatePage();
+  }
+});
+
+/* ------------------------------ ВАЛИДАЦИЯ ФОРМЫ ------------------------------ */
+
+// Валидация цены в зависимости от типа жилья
+var houseTypeMinValue = {
+  bungalo: {min: 0},
+  flat: {min: 1000},
+  house: {min: 5000},
+  palace: {min: 10000},
+};
+
+houseType.addEventListener('change', function () {
+  var value = houseTypeMinValue[houseType.value].min;
+  formPriceInput.setAttribute('min', value);
+  formPriceInput.placeholder = value;
+});
+
+// Валидация соответствия количества гостей (спальных мест) с количеством комнат
+adForm.addEventListener('change', function () {
+  if (roomsNumber.value < guestsNumber.value && roomsNumber.value !== '100' && guestsNumber.value !== '0') {
+    guestsNumber.setCustomValidity('Количество гостей не должно превышать количество комнат');
+  } else if (roomsNumber.value === '100' && guestsNumber.value !== '0') {
+    guestsNumber.setCustomValidity('Данное количество комнат не предназначено для гостей');
+  } else if (guestsNumber.value === '0' && roomsNumber.value !== '100') {
+    roomsNumber.setCustomValidity('Для нежилого помещения необходимо выбрать максимальное количество комнат');
+  } else {
+    roomsNumber.setCustomValidity('');
+    guestsNumber.setCustomValidity('');
+  }
+});
+
+// Синхронизация времени въезда и времени выезда
+var onCheckInTimeChange = function () {
+  timeOut.value = timeIn.value;
+};
+
+var onCheckOutTimeChange = function () {
+  timeIn.value = timeOut.value;
+};
+
+timeIn.addEventListener('change', onCheckInTimeChange);
+timeOut.addEventListener('change', onCheckOutTimeChange);
