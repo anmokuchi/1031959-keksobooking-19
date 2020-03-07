@@ -2,7 +2,7 @@
 
 (function () {
   // Функция отрисовки метки
-  var newPin = function (offer, element, width, height) {
+  var getPin = function (offer, element, width, height) {
     var pinPosition = 'left: ' + (offer.location.x - (width / 2)) + 'px; top: ' + (offer.location.y - height) + 'px;';
 
     element.style = pinPosition;
@@ -13,6 +13,6 @@
   };
 
   window.pin = {
-    newPin: newPin,
+    getPin: getPin,
   };
 })();
