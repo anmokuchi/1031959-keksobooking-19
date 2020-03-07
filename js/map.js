@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  // Необходимые DOM-элементы
   var offersMap = document.querySelector('.map'); // карта с объявлениями
   var pinTemplate = document.querySelector('#pin').content.querySelector('button'); // шаблон метки объявления
   var mapPins = document.querySelector('.map__pins'); // элемент, куда добавлять метки объявлений

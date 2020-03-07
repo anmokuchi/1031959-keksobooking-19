@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  // Необходимые DOM-элементы
   var adForm = document.querySelector('.ad-form'); // форма объявления
   var houseType = document.querySelector('#type'); // выпадающее меню типа жилья
   var formPriceInput = adForm.querySelector('#price'); // инпут цены
