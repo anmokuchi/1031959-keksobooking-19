@@ -14,29 +14,6 @@ var addressInput = document.querySelector('#address'); // инпут адрес�
 var cardTemplate = document.querySelector('#card').content.querySelector('.map__card'); // шаблон карточки объявления
 var mapFiltersContainer = offersMap.querySelector('.map__filters-container'); // контейнер с фильтрами на карте
 
-// // Нахождение DOM-элемента с картой для определения координат по оси Х
-// // в зависимости от размера окна
-// var mapImage = document.querySelector('.map');
-// var coordinates = mapImage.getBoundingClientRect();
-
-// // Данные мока
-// var mock = {
-//   offersAmount: 8,
-//   offerTypes: ['palace', 'flat', 'house', 'bungalo'],
-//   offerCheckinTimes: ['12:00', '13:00', '14:00'],
-//   offerCheckoutTimes: ['12:00', '13:00', '14:00'],
-//   offerFeatures: ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'],
-//   offerPhotos: [
-//     'http://o0.github.io/assets/images/tokyo/hotel1.jpg',
-//     'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
-//     'http://o0.github.io/assets/images/tokyo/hotel3.jpg',
-//   ],
-//   locationMinX: 0,
-//   locationMaxX: coordinates.width,
-//   locationMinY: 130,
-//   locationMaxY: 630,
-// };
-
 // Размеры меток
 var pinWidth = 50; // ширина обычной метки
 var pinHeight = 70; // высота обычной метки
@@ -50,63 +27,16 @@ var pinMain = {// главная метка
 
 /* ------------------------------ ГЕНЕРАЦИЯ И ОТРИСОВКА МЕТОК ------------------------------ */
 
-// // Функция генерации массива с объектами
-// var getAdverts = function (options) {
-//   var offers = [];
-//   for (var i = 0; i < options.offersAmount; i++) {
-//     var minX = options.locationMinX;
-//     var minY = options.locationMinY;
-//     var maxX = options.locationMaxX;
-//     var maxY = options.locationMaxY;
+// // Функция отрисовки метки
+// var getPin = function (offer, element, width, height) {
+//   var pinPosition = 'left: ' + (offer.location.x - (width / 2)) + 'px; top: ' + (offer.location.y - height) + 'px;';
 
-//     var locationX = window.util.randomIntInclusive(minX, maxX);
-//     var locationY = window.util.randomIntInclusive(minY, maxY);
+//   element.style = pinPosition;
+//   element.querySelector('img').src = offer.author.avatar;
+//   element.querySelector('img').alt = offer.offer.title;
 
-//     var type = window.util.randomArrayElement(options.offerTypes);
-//     var checkin = window.util.randomArrayElement(options.offerCheckinTimes);
-//     var checkout = window.util.randomArrayElement(options.offerCheckoutTimes);
-//     var features = window.util.randomArray(options.offerFeatures);
-//     var photos = window.util.randomArray(options.offerPhotos);
-
-//     offers.push({
-//       author: {
-//         avatar: 'img/avatars/user0' + (i + 1) + '.png',
-//       },
-//       offer: {
-//         title: 'заголовок предложения',
-//         address: locationX + ', ' + locationY,
-//         price: 1000,
-//         type: type,
-//         rooms: 3,
-//         guests: 2,
-//         checkin: checkin,
-//         checkout: checkout,
-//         features: features,
-//         description: 'строка с описанием',
-//         photos: photos,
-//       },
-//       location: {
-//         x: locationX,
-//         y: locationY,
-//       }
-//     });
-//   }
-//   return offers;
+//   return element;
 // };
-
-// // Запись результата работы функции в переменную
-// var adverts = getAdverts(mock); // тут лежит массив из 8 сгенерированных объектов
-
-// Функция отрисовки метки
-var getPin = function (offer, element, width, height) {
-  var pinPosition = 'left: ' + (offer.location.x - (width / 2)) + 'px; top: ' + (offer.location.y - height) + 'px;';
-
-  element.style = pinPosition;
-  element.querySelector('img').src = offer.author.avatar;
-  element.querySelector('img').alt = offer.offer.title;
-
-  return element;
-};
 
 // Функция добавления меток во фрагмент и затем на страницу
 var getPins = function () {
@@ -114,7 +44,7 @@ var getPins = function () {
   for (var i = 0; i < window.data.adverts.length; i++) {
     var pinElement = pinTemplate.cloneNode(true);
     offersMap.appendChild(pinElement);
-    pinsFragment.appendChild(getPin(window.data.adverts[i], pinElement, pinWidth, pinHeight));
+    pinsFragment.appendChild(window.pin.newPin(window.data.adverts[i], pinElement, pinWidth, pinHeight));
   }
   mapPins.appendChild(pinsFragment);
 };
