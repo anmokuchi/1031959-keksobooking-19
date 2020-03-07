@@ -54,36 +54,6 @@ var pinMain = {// главная метка
   pointHeight: 15,
 };
 
-/* ------------------------------ ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ МЕТОК ------------------------------ */
-
-// Функция нахождения рандомного элемента массива
-var getRandomArrayElement = function (objects) {
-  return objects[Math.floor(Math.random() * objects.length)];
-};
-
-// Функция нахождения рандомного числа, включая максимум и минимум
-var getRandomIntInclusive = function (min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-};
-
-// Алгоритм Фишера-Йетса
-var shuffleArray = function (array) {
-  for (var i = array.length - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1));
-    var t = array[i]; array[i] = array[j]; array[j] = t;
-  }
-  return array;
-};
-
-// Функция генерации массива со случайными свойствами
-var getRandomArray = function (options) {
-  var optionsCopy = options.slice();
-  var optionsCopyRandom = shuffleArray(optionsCopy);
-  return optionsCopyRandom.slice(getRandomIntInclusive(0, optionsCopyRandom.length));
-};
-
 /* ------------------------------ ГЕНЕРАЦИЯ И ОТРИСОВКА МЕТОК ------------------------------ */
 
 // Функция генерации массива с объектами
@@ -95,14 +65,14 @@ var getAdverts = function (options) {
     var maxX = options.locationMaxX;
     var maxY = options.locationMaxY;
 
-    var locationX = getRandomIntInclusive(minX, maxX);
-    var locationY = getRandomIntInclusive(minY, maxY);
+    var locationX = window.util.randomIntInclusive(minX, maxX);
+    var locationY = window.util.randomIntInclusive(minY, maxY);
 
-    var type = getRandomArrayElement(options.offerTypes);
-    var checkin = getRandomArrayElement(options.offerCheckinTimes);
-    var checkout = getRandomArrayElement(options.offerCheckoutTimes);
-    var features = getRandomArray(options.offerFeatures);
-    var photos = getRandomArray(options.offerPhotos);
+    var type = window.util.randomArrayElement(options.offerTypes);
+    var checkin = window.util.randomArrayElement(options.offerCheckinTimes);
+    var checkout = window.util.randomArrayElement(options.offerCheckoutTimes);
+    var features = window.util.randomArray(options.offerFeatures);
+    var photos = window.util.randomArray(options.offerPhotos);
 
     offers.push({
       author: {
@@ -188,12 +158,6 @@ var mergeFeaturesAndCard = function (features, featuresContainer) {
   }
 };
 
-// Функция склонения числительных
-var declineTitle = function (number, titles) {
-  var cases = [2, 0, 1, 1, 1, 2];
-  return titles[(number % 100 > 4 && number % 100 < 20) ? 2 : cases[(number % 10 < 5) ? number % 10 : 5]];
-};
-
 // Объект-словарь с типами жилья
 var translate = {
   flat: 'Квартира',
@@ -206,8 +170,8 @@ var translate = {
 
 // Функция отрисовки карточки с объявлением
 var getCard = function (offer, element) {
-  var roomText = declineTitle(offer.offer.rooms, [' комната', ' комнаты', ' комнат']);
-  var guestText = declineTitle(offer.offer.guests, [' гостя', ' гостей', ' гостей']);
+  var roomText = window.util.declineTitle(offer.offer.rooms, [' комната', ' комнаты', ' комнат']);
+  var guestText = window.util.declineTitle(offer.offer.guests, [' гостя', ' гостей', ' гостей']);
 
   var popupTitle = element.querySelector('.popup__title');
   var popupAddress = element.querySelector('.popup__text--address');
@@ -326,15 +290,11 @@ var closePopup = function () {
   });
 
   popupClose.addEventListener('keydown', function (evt) {
-    if (evt.key === 'Enter') {
-      popup.remove();
-    }
+    window.util.isEnterRemoveEvent(evt, popup);
   });
 
   document.addEventListener('keydown', function (evt) {
-    if (evt.key === 'Escape') {
-      popup.remove();
-    }
+    window.util.isEscRemoveEvent(evt, popup);
   });
 };
 
@@ -385,16 +345,12 @@ var activatePage = function () {
 
 // Обработчик активации страницы по нажатию на левую клавишу мыши
 pinMain.element.addEventListener('mousedown', function (evt) {
-  if (evt.button === 0) {
-    activatePage();
-  }
+  window.util.isLeftMouseButtonEvent(evt, activatePage);
 });
 
 // Обработчик активации страницы по нажатию на Enter
 pinMain.element.addEventListener('keydown', function (evt) {
-  if (evt.key === 'Enter') {
-    activatePage();
-  }
+  window.util.isEnterEvent(evt, activatePage);
 });
 
 /* ------------------------------ ВАЛИДАЦИЯ ФОРМЫ ------------------------------ */
