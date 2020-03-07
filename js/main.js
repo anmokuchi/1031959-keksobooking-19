@@ -11,14 +11,8 @@ var adFormHeader = document.querySelector('.ad-form-header'); // заголов�
 var adFormElements = document.querySelectorAll('.ad-form__element'); // элементы формы
 var mapFilters = document.querySelector('.map__filters'); // форма с фильтрами
 var addressInput = document.querySelector('#address'); // инпут адреса
-var roomsNumber = adForm.querySelector('#room_number'); // выпадающее меню количества комнат
-var guestsNumber = adForm.querySelector('#capacity'); // выпадающее меню количества гостей
 var cardTemplate = document.querySelector('#card').content.querySelector('.map__card'); // шаблон карточки объявления
 var mapFiltersContainer = offersMap.querySelector('.map__filters-container'); // контейнер с фильтрами на карте
-var formPriceInput = adForm.querySelector('#price'); // инпут цены
-var houseType = document.querySelector('#type'); // выпадающее меню типа жилья
-var timeIn = adForm.querySelector('#timein'); // выпадающее меню времени заезда
-var timeOut = adForm.querySelector('#timeout'); // выпадающее меню времени выезда
 
 // Нахождение DOM-элемента с картой для определения координат по оси Х
 // в зависимости от размера окна
@@ -352,45 +346,3 @@ pinMain.element.addEventListener('mousedown', function (evt) {
 pinMain.element.addEventListener('keydown', function (evt) {
   window.util.isEnterEvent(evt, activatePage);
 });
-
-/* ------------------------------ ВАЛИДАЦИЯ ФОРМЫ ------------------------------ */
-
-// Валидация цены в зависимости от типа жилья
-var houseTypeMinValue = {
-  bungalo: {min: 0},
-  flat: {min: 1000},
-  house: {min: 5000},
-  palace: {min: 10000},
-};
-
-houseType.addEventListener('change', function () {
-  var value = houseTypeMinValue[houseType.value].min;
-  formPriceInput.setAttribute('min', value);
-  formPriceInput.placeholder = value;
-});
-
-// Валидация соответствия количества гостей (спальных мест) с количеством комнат
-adForm.addEventListener('change', function () {
-  if (roomsNumber.value < guestsNumber.value && roomsNumber.value !== '100' && guestsNumber.value !== '0') {
-    guestsNumber.setCustomValidity('Количество гостей не должно превышать количество комнат');
-  } else if (roomsNumber.value === '100' && guestsNumber.value !== '0') {
-    guestsNumber.setCustomValidity('Данное количество комнат не предназначено для гостей');
-  } else if (guestsNumber.value === '0' && roomsNumber.value !== '100') {
-    roomsNumber.setCustomValidity('Для нежилого помещения необходимо выбрать максимальное количество комнат');
-  } else {
-    roomsNumber.setCustomValidity('');
-    guestsNumber.setCustomValidity('');
-  }
-});
-
-// Синхронизация времени въезда и времени выезда
-var onCheckInTimeChange = function () {
-  timeOut.value = timeIn.value;
-};
-
-var onCheckOutTimeChange = function () {
-  timeIn.value = timeOut.value;
-};
-
-timeIn.addEventListener('change', onCheckInTimeChange);
-timeOut.addEventListener('change', onCheckOutTimeChange);
