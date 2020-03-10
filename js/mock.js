@@ -71,7 +71,7 @@
   // Запись результата работы функции в переменную
   var adverts = getAdverts(mock); // тут лежит массив из 8 сгенерированных объявлений
 
-  window.data = {
+  window.mock = {
     adverts: adverts,
   };
 })();

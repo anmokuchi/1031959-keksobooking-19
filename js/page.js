@@ -44,8 +44,7 @@
   var activatePage = function () {
     offersMap.classList.remove('map--faded'); // удаление класса map--faded у карты с объявлениями для ее активации
     adForm.classList.remove('ad-form--disabled'); // удаление класса ad-form--disabled у формы объявления для ее активации
-    window.map.getPins(); // вызов функции добавления меток
-    window.map.openPopup(); // обработчик по клику по метке
+    window.pin.addPins(); // вызов функции добавления меток
     addressInput.value = getMainPinCoordinatesValue(pinMain, true); // получение координат метки
     adFormHeader.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с заголовка формы
     mapFilters.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с формы с фильтрами
@@ -56,11 +55,15 @@
 
   // Обработчик активации страницы по нажатию на левую клавишу мыши
   pinMain.element.addEventListener('mousedown', function (evt) {
-    window.util.isLeftMouseButtonEvent(evt, activatePage);
+    if (evt.button === 0) {
+      activatePage();
+    }
   });
 
   // Обработчик активации страницы по нажатию на Enter
   pinMain.element.addEventListener('keydown', function (evt) {
-    window.util.isEnterEvent(evt, activatePage);
+    if (evt.key === 'Enter') {
+      activatePage();
+    }
   });
 })();

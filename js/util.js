@@ -1,8 +1,6 @@
 'use strict';
 
 (function () {
-  var ESC_KEYCODE = 27;
-
   // Функция нахождения рандомного элемента массива
   var randomArrayElement = function (objects) {
     return objects[Math.floor(Math.random() * objects.length)];
@@ -37,51 +35,11 @@
     return titles[(number % 100 > 4 && number % 100 < 20) ? 2 : cases[(number % 10 < 5) ? number % 10 : 5]];
   };
 
-  // Обработчик по нажатию Escape
-  var isEscEvent = function (evt, action) {
-    if (evt.key === 'Escape') {
-      action();
-    }
-  };
-
-  // Обработчик по скрытию окна при нажатии Escape
-  var isEscRemoveEvent = function (evt, target) {
-    if (evt.keyCode === ESC_KEYCODE) {
-      target.remove();
-    }
-  };
-
-  // Обработчик по нажатию Enter
-  var isEnterEvent = function (evt, action) {
-    if (evt.key === 'Enter') {
-      action();
-    }
-  };
-
-  // Обработчик по скрытию окна при нажатии Enter
-  var isEnterRemoveEvent = function (evt, target) {
-    if (evt.key === 'Enter') {
-      target.remove();
-    }
-  };
-
-  // Обработчик по нажатию ЛКМ
-  var isLeftMouseButtonEvent = function (evt, action) {
-    if (evt.button === 0) {
-      action();
-    }
-  };
-
   window.util = {
     randomArrayElement: randomArrayElement,
     randomIntInclusive: randomIntInclusive,
     randomArray: randomArray,
     declineTitle: declineTitle,
-    isEscEvent: isEscEvent,
-    isEscRemoveEvent: isEscRemoveEvent,
-    isEnterEvent: isEnterEvent,
-    isEnterRemoveEvent: isEnterRemoveEvent,
-    isLeftMouseButtonEvent: isLeftMouseButtonEvent,
   };
 })();
 

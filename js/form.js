@@ -25,18 +25,45 @@
   });
 
   // Валидация соответствия количества гостей (спальных мест) с количеством комнат
-  adForm.addEventListener('change', function () {
-    if (roomsNumber.value < guestsNumber.value && roomsNumber.value !== '100' && guestsNumber.value !== '0') {
-      guestsNumber.setCustomValidity('Количество гостей не должно превышать количество комнат');
-    } else if (roomsNumber.value === '100' && guestsNumber.value !== '0') {
-      guestsNumber.setCustomValidity('Данное количество комнат не предназначено для гостей');
-    } else if (guestsNumber.value === '0' && roomsNumber.value !== '100') {
-      roomsNumber.setCustomValidity('Для нежилого помещения необходимо выбрать максимальное количество комнат');
-    } else {
-      roomsNumber.setCustomValidity('');
+  var roomSetting = {
+    1: {
+      minGuest: 1,
+      maxGuest: 1,
+      errorMessage: 'Выберите «для 1 гостя»',
+    },
+    2: {
+      minGuest: 1,
+      maxGuest: 2,
+      errorMessage: 'Выберите «для 2 гостей» или «для 1 гостя»',
+    },
+    3: {
+      minGuest: 1,
+      maxGuest: 3,
+      errorMessage: 'Выберите «для 3 гостей», «для 2 гостей» или «для 1 гостя»',
+    },
+    100: {
+      minGuest: 0,
+      maxGuest: 0,
+      errorMessage: 'Выберите «не для гостей»',
+    },
+  };
+
+  var roomsNumberValidity = function () {
+    var roomValue = roomsNumber.value;
+    var guestValue = guestsNumber.value;
+    var maxGuest = roomSetting[roomValue].maxGuest;
+    var minGuest = roomSetting[roomValue].minGuest;
+    if (guestValue >= minGuest && guestValue <= maxGuest) {
       guestsNumber.setCustomValidity('');
+    } else {
+      guestsNumber.setCustomValidity(roomSetting[roomValue].errorMessage);
     }
-  });
+  };
+
+  roomsNumberValidity();
+
+  roomsNumber.addEventListener('change', roomsNumberValidity);
+  guestsNumber.addEventListener('change', roomsNumberValidity);
 
   // Синхронизация времени въезда и времени выезда
   var onCheckInTimeChange = function () {

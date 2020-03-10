@@ -1,6 +1,45 @@
 'use strict';
 
 (function () {
+  var offersMap = document.querySelector('.map');
+  var cardTemplate = document.querySelector('#card').content.querySelector('.map__card'); // шаблон карточки объявления
+  var mapFiltersContainer = offersMap.querySelector('.map__filters-container'); // контейнер с фильтрами на карте
+
+  offersMap.addEventListener('click', function (evt) {
+    var pin = evt.target.closest('.map__pin:not(.map__pin--main)');
+    if (!pin) {
+      return;
+    }
+    var popup = document.querySelector('.popup');
+    if (popup) {
+      popup.remove();
+    }
+    var index = pin.dataset.index;
+    addCard(index);
+    closePopup();
+  });
+
+  var closePopup = function () {
+    var popup = document.querySelector('.popup');
+    var popupClose = popup.querySelector('.popup__close');
+
+    popupClose.addEventListener('click', function () {
+      popup.remove();
+    });
+
+    popupClose.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Enter') {
+        popup.remove();
+      }
+    });
+
+    document.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Escape') {
+        popup.remove();
+      }
+    });
+  };
+
   // Функция для создания иконок с фотографиями
   var mergePhotosAndCard = function (photos, photosContainer) {
     if (photos === undefined) {
@@ -113,7 +152,10 @@
     return element;
   };
 
-  window.card = {
-    getCard: getCard,
+  var addCard = function (index) {
+    var cardElement = cardTemplate.cloneNode(true);
+    var cardsFragment = document.createDocumentFragment();
+    cardsFragment.appendChild(getCard(window.mock.adverts[index], cardElement));
+    offersMap.insertBefore(cardsFragment, mapFiltersContainer);
   };
 })();
