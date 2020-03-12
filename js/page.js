@@ -9,6 +9,11 @@
   var mapFilters = document.querySelector('.map__filters'); // форма с фильтрами
   var addressInput = document.querySelector('#address'); // инпут адреса
 
+  var clientSize = {
+    MIN_Y: 130,
+    MAX_Y: 630,
+  };
+
   var pinMain = {// главная метка
     element: document.querySelector('.map__pin--main'),
     width: 65,
@@ -66,4 +71,60 @@
       activatePage();
     }
   });
+
+  // Обработчик перетаскивания главного пина
+  var onPinMain = function (evt) {
+    evt.preventDefault();
+
+    var startCoords = {
+      x: evt.clientX,
+      y: evt.clientY
+    };
+
+    var clientWidth = offersMap.clientWidth;
+
+    var onMouseMove = function (moveEvt) {
+      moveEvt.preventDefault();
+
+      var shift = {
+        x: startCoords.x - moveEvt.clientX,
+        y: startCoords.y - moveEvt.clientY
+      };
+
+      startCoords = {
+        x: moveEvt.clientX,
+        y: moveEvt.clientY
+      };
+
+      if (pinMain.element.offsetTop - shift.y < clientSize.MIN_Y) {
+        pinMain.element.style.top = clientSize.MIN_Y + 'px';
+      } else if (pinMain.element.offsetTop - shift.y > clientSize.MAX_Y) {
+        pinMain.element.style.top = clientSize.MAX_Y + 'px';
+      } else {
+        pinMain.element.style.top = (pinMain.element.offsetTop - shift.y) + 'px';
+      }
+
+      if (clientWidth - pinMain.width / 2 < pinMain.element.offsetLeft - shift.x) {
+        pinMain.element.style.left = clientWidth - pinMain.width / 2 + 'px';
+      } else if (pinMain.element.offsetLeft - shift.x < 0) {
+        pinMain.element.style.left = -pinMain.width / 2 + 'px';
+      } else {
+        pinMain.element.style.left = (pinMain.element.offsetLeft - shift.x) + 'px';
+      }
+
+      addressInput.value = getMainPinCoordinatesValue(pinMain, true);
+    };
+
+    var onMouseUp = function (upEvt) {
+      upEvt.preventDefault();
+
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  };
+
+  pinMain.element.addEventListener('mousedown', onPinMain);
 })();
