@@ -9,7 +9,7 @@
   var mapFilters = document.querySelector('.map__filters'); // форма с фильтрами
   var addressInput = document.querySelector('#address'); // инпут адреса
 
-  var clientSize = {
+  var ClientSize = {
     MIN_Y: 130,
     MAX_Y: 630,
   };
@@ -83,6 +83,11 @@
 
     var clientWidth = offersMap.clientWidth;
 
+    var pinMainPointCoords = {
+      x: pinMain.width / 2,
+      y: pinMain.height + pinMain.pointHeight,
+    };
+
     var onMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
 
@@ -96,20 +101,25 @@
         y: moveEvt.clientY
       };
 
-      if (pinMain.element.offsetTop - shift.y < clientSize.MIN_Y) {
-        pinMain.element.style.top = clientSize.MIN_Y + 'px';
-      } else if (pinMain.element.offsetTop - shift.y > clientSize.MAX_Y) {
-        pinMain.element.style.top = clientSize.MAX_Y + 'px';
-      } else {
-        pinMain.element.style.top = (pinMain.element.offsetTop - shift.y) + 'px';
+      var delta = {
+        x: pinMain.element.offsetLeft - shift.x,
+        y: pinMain.element.offsetTop - shift.y,
+      };
+
+      pinMain.element.style.top = delta.y + 'px';
+      if (delta.y < ClientSize.MIN_Y - pinMainPointCoords.y) {
+        pinMain.element.style.top = (ClientSize.MIN_Y - pinMainPointCoords.y) + 'px';
+      }
+      if (delta.y > ClientSize.MAX_Y - pinMainPointCoords.y) {
+        pinMain.element.style.top = (ClientSize.MAX_Y - pinMainPointCoords.y) + 'px';
       }
 
-      if (clientWidth - pinMain.width / 2 < pinMain.element.offsetLeft - shift.x) {
-        pinMain.element.style.left = clientWidth - pinMain.width / 2 + 'px';
-      } else if (pinMain.element.offsetLeft - shift.x < 0) {
-        pinMain.element.style.left = -pinMain.width / 2 + 'px';
-      } else {
-        pinMain.element.style.left = (pinMain.element.offsetLeft - shift.x) + 'px';
+      pinMain.element.style.left = delta.x + 'px';
+      if (delta.x < 0 - pinMainPointCoords.x) {
+        pinMain.element.style.left = -pinMainPointCoords.x + 'px';
+      }
+      if (delta.x > clientWidth - pinMainPointCoords.x) {
+        pinMain.element.style.left = (clientWidth - pinMainPointCoords.x) + 'px';
       }
 
       addressInput.value = getMainPinCoordinatesValue(pinMain, true);
