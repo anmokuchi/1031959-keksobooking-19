@@ -148,7 +148,7 @@
 
     var cardElement = cardTemplate.cloneNode(true);
     var cardsFragment = document.createDocumentFragment();
-    cardsFragment.appendChild(getCard(window.mock.adverts[index], cardElement));
+    cardsFragment.appendChild(getCard(window.backend.offers[index], cardElement));
     offersMap.insertBefore(cardsFragment, mapFiltersContainer);
 
     addListenersOnPopup();

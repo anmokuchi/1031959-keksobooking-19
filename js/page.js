@@ -45,11 +45,9 @@
   // Заполнение поля адреса координатами центра метки в неактивном состоянии
   addressInput.value = getMainPinCoordinatesValue(pinMain, false);
 
-  var pins = [];
-
   var onSuccess = function (data) {
-    pins = data;
-    window.pin.addPins(pins);
+    window.backend.offers = data;
+    window.pin.addPins(window.backend.offers);
   };
 
   // Функция активации страницы
