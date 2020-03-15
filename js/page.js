@@ -45,11 +45,19 @@
   // Заполнение поля адреса координатами центра метки в неактивном состоянии
   addressInput.value = getMainPinCoordinatesValue(pinMain, false);
 
+  var pins = [];
+
+  var onSuccess = function (data) {
+    pins = data;
+    window.pin.addPins(pins);
+  };
+
   // Функция активации страницы
   var activatePage = function () {
     offersMap.classList.remove('map--faded'); // удаление класса map--faded у карты с объявлениями для ее активации
     adForm.classList.remove('ad-form--disabled'); // удаление класса ad-form--disabled у формы объявления для ее активации
-    window.pin.addPins(); // вызов функции добавления меток
+    // window.pin.addPins(); // вызов функции добавления меток
+    window.backend.load(onSuccess, window.util.onError);
     addressInput.value = getMainPinCoordinatesValue(pinMain, true); // получение координат метки
     adFormHeader.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с заголовка формы
     mapFilters.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с формы с фильтрами
