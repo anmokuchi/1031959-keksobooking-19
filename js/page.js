@@ -35,33 +35,55 @@
     return Math.round(pinMainLocationX) + ', ' + Math.round(pinMainLocationY);
   };
 
-  // Добавление атрибута disabled для элементов fieldset (блокируются поля формы в группе)
-  adFormHeader.setAttribute('disabled', 'disabled'); // для заголовка формы
-  mapFilters.setAttribute('disabled', 'disabled'); // для формы с фильтрами
-  adFormElements.forEach(function (element) { // для всех элементов формы
-    element.setAttribute('disabled', 'disabled');
-  });
+  var deactivateForm = function () {
+    adFormElements.forEach(function (element) {
+      element.setAttribute('disabled', 'disabled');
+    });
+  };
 
-  // Заполнение поля адреса координатами центра метки в неактивном состоянии
-  addressInput.value = getMainPinCoordinatesValue(pinMain, false);
+  var deactivatePage = function () {
+    offersMap.classList.add('map--faded');
+    adForm.classList.add('ad-form--disabled');
+    adFormHeader.setAttribute('disabled', 'disabled');
+    mapFilters.setAttribute('disabled', 'disabled');
+    adForm.reset();
+    deactivateForm();
+
+    var userPins = offersMap.querySelectorAll('.map__pin:not(.map__pin--main)');
+    userPins.forEach(function (pin) {
+      pin.classList.add('hidden');
+    });
+
+    var popup = document.querySelector('.popup');
+    if (popup) {
+      popup.remove();
+    }
+
+    addressInput.value = getMainPinCoordinatesValue(pinMain, false);
+  };
+
+  deactivatePage();
 
   var onSuccess = function (data) {
     window.backend.offers = data;
     window.pin.addPins(window.backend.offers);
   };
 
-  // Функция активации страницы
-  var activatePage = function () {
-    offersMap.classList.remove('map--faded'); // удаление класса map--faded у карты с объявлениями для ее активации
-    adForm.classList.remove('ad-form--disabled'); // удаление класса ad-form--disabled у формы объявления для ее активации
-    // window.pin.addPins(); // вызов функции добавления меток
-    window.backend.load(onSuccess, window.util.onError);
-    addressInput.value = getMainPinCoordinatesValue(pinMain, true); // получение координат метки
-    adFormHeader.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с заголовка формы
-    mapFilters.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с формы с фильтрами
-    adFormElements.forEach(function (element) { // удаление атрибута disabled с элементов формы
+  var activateForm = function () {
+    adFormElements.forEach(function (element) {
       element.removeAttribute('disabled', 'disabled');
     });
+  };
+
+  // Функция активации страницы
+  var activatePage = function () {
+    offersMap.classList.remove('map--faded');
+    adForm.classList.remove('ad-form--disabled');
+    window.backend.load(onSuccess, window.util.onError);
+    adFormHeader.removeAttribute('disabled', 'disabled');
+    mapFilters.removeAttribute('disabled', 'disabled');
+    activateForm();
+    addressInput.value = getMainPinCoordinatesValue(pinMain, true);
   };
 
   // Обработчик активации страницы по нажатию на левую клавишу мыши
@@ -143,4 +165,8 @@
   };
 
   pinMain.element.addEventListener('mousedown', onPinMain);
+
+  window.page = {
+    deactivatePage: deactivatePage,
+  };
 })();

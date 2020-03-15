@@ -9,6 +9,7 @@
   var guestsNumber = adForm.querySelector('#capacity'); // выпадающее меню количества гостей
   var timeIn = adForm.querySelector('#timein'); // выпадающее меню времени заезда
   var timeOut = adForm.querySelector('#timeout'); // выпадающее меню времени выезда
+  var resetButton = adForm.querySelector('.ad-form__reset');
 
   // Валидация цены в зависимости от типа жилья
   var houseTypeMinValue = {
@@ -76,4 +77,79 @@
 
   timeIn.addEventListener('change', onCheckInTimeChange);
   timeOut.addEventListener('change', onCheckOutTimeChange);
+
+  // Сообщение об успешной отправке формы
+  var successTemplate = document.querySelector('#success').content.querySelector('.success');
+  var successElement = successTemplate.cloneNode(true);
+  var onSuccess = function () {
+    document.body.appendChild(successElement);
+    window.page.deactivatePage();
+    addListenersOnSuccessMessage();
+  };
+
+  var removeSuccessMessage = function () {
+    document.body.removeChild(successElement);
+  };
+
+  var addListenersOnSuccessMessage = function () {
+    document.addEventListener('click', function () {
+      removeSuccessMessage();
+    });
+
+    document.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Escape') {
+        removeSuccessMessage();
+      }
+    });
+  };
+
+  // Сообщение об ошибке отправки формы
+  var errorTemplate = document.querySelector('#error').content.querySelector('.error');
+  var errorElement = errorTemplate.cloneNode(true);
+  var onError = function () {
+    document.body.appendChild(errorElement);
+    addListenersOnErrorMessage();
+  };
+
+  var removeErrorMessage = function () {
+    document.body.removeChild(errorElement);
+  };
+
+  var addListenersOnErrorMessage = function () {
+    var errorButton = document.querySelector('.error__button');
+
+    document.addEventListener('click', function () {
+      removeErrorMessage();
+    });
+
+    errorButton.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Enter') {
+        removeErrorMessage();
+      }
+    });
+
+    document.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Escape') {
+        removeErrorMessage();
+      }
+    });
+  };
+
+  var onResetButtonClick = function () {
+    window.page.deactivatePage();
+  };
+
+  resetButton.addEventListener('click', onResetButtonClick);
+
+  resetButton.addEventListener('keydown', function (evt) {
+    if (evt.key === 'Enter') {
+      window.page.deactivatePage();
+    }
+  });
+
+  // Обработчик отправки данных
+  adForm.addEventListener('submit', function (evt) {
+    window.backend.save(new FormData(adForm), onSuccess, onError);
+    evt.preventDefault();
+  });
 })();

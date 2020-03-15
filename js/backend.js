@@ -2,7 +2,7 @@
 
 (function () {
   var LOAD_URL = 'https://js.dump.academy/keksobooking/data';
-  // var SAVE_URL = '';
+  var SAVE_URL = 'https://js.dump.academy/keksobooking';
 
   var StatusCode = {
     OK: 200
@@ -44,13 +44,13 @@
         url: LOAD_URL,
       }, onLoad, onError);
     },
-    // save: function (data, onLoad, onError) {
-    //   sendRequest({
-    //     method: 'POST',
-    //     url: SAVE_URL,
-    //     data: data,
-    //   }, onLoad, onError);
-    // },
+    save: function (data, onLoad, onError) {
+      sendRequest({
+        method: 'POST',
+        url: SAVE_URL,
+        data: data,
+      }, onLoad, onError);
+    },
     offers: offers,
   };
 })();
