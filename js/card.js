@@ -6,9 +6,16 @@
   var mapFiltersContainer = offersMap.querySelector('.map__filters-container'); // контейнер с фильтрами на карте
 
   // Функция удаления активного класса с меток
-  var userPinsLiveCollection = offersMap.getElementsByClassName('map__pin');
-  var cleanAllPinActiveClass = function () {
-    Array.from(userPinsLiveCollection).forEach(function (pin) {
+  // var userPinsLiveCollection = offersMap.getElementsByClassName('map__pin');
+  // var cleanAllPinActiveClass = function () {
+  //   Array.from(userPinsLiveCollection).forEach(function (pin) {
+  //     pin.classList.remove('map__pin--active');
+  //   });
+  // };
+  // Функция удаления активного класса с меток без использования живой коллекции
+  var removePinsActiveClass = function () {
+    var activePins = document.querySelectorAll('.map__pin.map__pin--active');
+    activePins.forEach(function (pin) {
       pin.classList.remove('map__pin--active');
     });
   };
@@ -20,7 +27,8 @@
       return;
     }
 
-    cleanAllPinActiveClass();
+    removePinsActiveClass();
+    // cleanAllPinActiveClass();
     pin.classList.add('map__pin--active');
 
     var index = pin.dataset.index;
@@ -161,20 +169,23 @@
 
     popupClose.addEventListener('click', function () {
       popup.remove();
-      cleanAllPinActiveClass();
+      removePinsActiveClass();
+      // cleanAllPinActiveClass();
     });
 
     popupClose.addEventListener('keydown', function (evt) {
       if (evt.key === 'Enter') {
         popup.remove();
-        cleanAllPinActiveClass();
+        removePinsActiveClass();
+        // cleanAllPinActiveClass();
       }
     });
 
     document.addEventListener('keydown', function (evt) {
       if (evt.key === 'Escape') {
         popup.remove();
-        cleanAllPinActiveClass();
+        removePinsActiveClass();
+        // cleanAllPinActiveClass();
       }
     });
   };

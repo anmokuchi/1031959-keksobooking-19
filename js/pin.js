@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var MAP_MAX_PINS = 5;
+
   var offersMap = document.querySelector('.map'); // карта с объявлениями
   var pinTemplate = document.querySelector('#pin').content.querySelector('button'); // шаблон метки объявления
   var mapPins = document.querySelector('.map__pins'); // элемент, куда добавлять метки объявлений
@@ -23,10 +25,21 @@
     return element;
   };
 
+  var removePins = function () {
+    var userPins = document.querySelectorAll('.map__pin');
+    userPins.forEach(function (pin) {
+      if (!pin.classList.contains('map__pin--main')) {
+        pin.remove();
+      }
+    });
+  };
+
   // Функция добавления меток во фрагмент и затем на страницу
   var addPins = function (data) {
+    removePins();
     var pinsFragment = document.createDocumentFragment();
-    for (var i = 0; i < data.length; i++) {
+    var pinsOnMap = data.length > MAP_MAX_PINS ? MAP_MAX_PINS : data.length;
+    for (var i = 0; i < pinsOnMap; i++) {
       var pinElement = pinTemplate.cloneNode(true);
       offersMap.appendChild(pinElement);
       pinsFragment.appendChild(getPin(data[i], pinElement, pinWidth, pinHeight, i));

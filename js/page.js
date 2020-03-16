@@ -8,6 +8,8 @@
   var adFormElements = document.querySelectorAll('.ad-form__element'); // элементы формы
   var mapFilters = document.querySelector('.map__filters'); // форма с фильтрами
   var addressInput = document.querySelector('#address'); // инпут адреса
+  var resetButton = adForm.querySelector('.ad-form__reset');
+  var housingTypeFilter = document.querySelector('#housing-type');
 
   var ClientSize = {
     MIN_Y: 130,
@@ -19,6 +21,11 @@
     width: 65,
     height: 65,
     pointHeight: 15,
+  };
+
+  var setDefaultPinMainLocation = function () {
+    pinMain.element.style.left = '570px';
+    pinMain.element.style.top = '375px';
   };
 
   // Функция получения координат главной метки
@@ -41,6 +48,15 @@
     });
   };
 
+  var removePins = function () {
+    var userPins = document.querySelectorAll('.map__pin');
+    userPins.forEach(function (pin) {
+      if (!pin.classList.contains('map__pin--main')) {
+        pin.remove();
+      }
+    });
+  };
+
   var deactivatePage = function () {
     offersMap.classList.add('map--faded');
     adForm.classList.add('ad-form--disabled');
@@ -48,11 +64,8 @@
     mapFilters.setAttribute('disabled', 'disabled');
     adForm.reset();
     deactivateForm();
-
-    var userPins = offersMap.querySelectorAll('.map__pin:not(.map__pin--main)');
-    userPins.forEach(function (pin) {
-      pin.classList.add('hidden');
-    });
+    removePins();
+    setDefaultPinMainLocation();
 
     var popup = document.querySelector('.popup');
     if (popup) {
@@ -64,9 +77,24 @@
 
   deactivatePage();
 
+  var updatePins = function () { // это можно через объект сделать, чтобы без ифов?
+    if (housingTypeFilter.value === 'any') {
+      window.pin.addPins(window.backend.offers);
+    } else {
+      var sameHouseTypes = window.backend.offers.filter(function (element) {
+        return element.offer.type === housingTypeFilter.value;
+      });
+      window.pin.addPins(sameHouseTypes);
+    }
+  };
+
+  housingTypeFilter.addEventListener('change', function () {
+    updatePins();
+  });
+
   var onSuccess = function (data) {
     window.backend.offers = data;
-    window.pin.addPins(window.backend.offers);
+    updatePins();
   };
 
   var activateForm = function () {
@@ -166,7 +194,82 @@
 
   pinMain.element.addEventListener('mousedown', onPinMain);
 
-  window.page = {
-    deactivatePage: deactivatePage,
+  // Сообщение об успешной отправке формы
+  var successTemplate = document.querySelector('#success').content.querySelector('.success');
+  var successElement = successTemplate.cloneNode(true);
+  var onLoad = function () {
+    document.body.appendChild(successElement);
+    deactivatePage();
+    addListenersOnSuccessMessage();
   };
+
+  var removeSuccessMessage = function () {
+    document.body.removeChild(successElement);
+  };
+
+  var addListenersOnSuccessMessage = function () {
+    document.addEventListener('click', function () {
+      removeSuccessMessage();
+    });
+
+    document.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Escape') {
+        removeSuccessMessage();
+      }
+    });
+  };
+
+  // Сообщение об ошибке отправки формы
+  var errorTemplate = document.querySelector('#error').content.querySelector('.error');
+  var errorElement = errorTemplate.cloneNode(true);
+  var onError = function () {
+    document.body.appendChild(errorElement);
+    addListenersOnErrorMessage();
+  };
+
+  var removeErrorMessage = function () {
+    document.body.removeChild(errorElement);
+  };
+
+  var addListenersOnErrorMessage = function () {
+    var errorButton = document.querySelector('.error__button');
+
+    document.addEventListener('click', function () {
+      removeErrorMessage();
+    });
+
+    errorButton.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Enter') {
+        removeErrorMessage();
+      }
+    });
+
+    document.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Escape') {
+        removeErrorMessage();
+      }
+    });
+  };
+
+  var onResetButtonClick = function () {
+    deactivatePage();
+  };
+
+  resetButton.addEventListener('click', onResetButtonClick);
+
+  resetButton.addEventListener('keydown', function (evt) {
+    if (evt.key === 'Enter') {
+      deactivatePage();
+    }
+  });
+
+  // Обработчик отправки данных
+  adForm.addEventListener('submit', function (evt) {
+    window.backend.save(new FormData(adForm), onLoad, onError);
+    evt.preventDefault();
+  });
+
+  // window.page = {
+  //   deactivatePage: deactivatePage,
+  // };
 })();
