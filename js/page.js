@@ -14,6 +14,7 @@
     errorTemplate: '#error',
     error: '.error',
     errorButton: '.error__button',
+    adFormReset: '.ad-form__reset',
   };
 
   var cssClass = {
@@ -28,6 +29,7 @@
     adFormElements: document.querySelectorAll(selector.adFormElement),
     mapFilters: document.querySelector(selector.mapFilters),
     addressInput: document.querySelector(selector.address),
+    resetButton: document.querySelector(selector.adFormReset),
   };
 
   /* ------------------------------ КООРДИНАТЫ ГЛАВНОЙ МЕТКИ ------------------------------ */
@@ -115,9 +117,6 @@
     domElement.adFormHeader.removeAttribute('disabled', 'disabled');
     activateForm();
     domElement.addressInput.value = getMainPinCoordinatesValue(pinMain, true);
-
-    pinMain.element.removeEventListener('mousedown', onPinMainLeftButtonClick);
-    pinMain.element.removeEventListener('keydown', onPinMainEnterPress);
   };
 
   window.pin.onPinClick(function (index) {
@@ -210,6 +209,20 @@
   };
 
   pinMain.element.addEventListener('mousedown', onPinMain);
+
+  /* ------------------------------ ОБРАБОТЧИК ДЛЯ ОЧИСТКИ ФОРМЫ ------------------------------ */
+
+  var onResetButtonClick = function () {
+    deactivatePage();
+  };
+
+  domElement.resetButton.addEventListener('click', onResetButtonClick);
+
+  domElement.resetButton.addEventListener('keydown', function (evt) {
+    if (evt.key === 'Enter') {
+      deactivatePage();
+    }
+  });
 
   /* ------------------------------ ОТПРАВКА ФОРМЫ ОБЪЯВЛЕНИЯ ------------------------------ */
 
