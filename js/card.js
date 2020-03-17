@@ -5,40 +5,27 @@
   var cardTemplate = document.querySelector('#card').content.querySelector('.map__card'); // шаблон карточки объявления
   var mapFiltersContainer = offersMap.querySelector('.map__filters-container'); // контейнер с фильтрами на карте
 
+  // Функция удаления активного класса с меток
+  var userPinsLiveCollection = offersMap.getElementsByClassName('map__pin');
+  var cleanAllPinActiveClass = function () {
+    Array.from(userPinsLiveCollection).forEach(function (pin) {
+      pin.classList.remove('map__pin--active');
+    });
+  };
+
+  // Обработчик открытия карточки по нажатию на метку
   offersMap.addEventListener('click', function (evt) {
     var pin = evt.target.closest('.map__pin:not(.map__pin--main)');
     if (!pin) {
       return;
     }
-    var popup = document.querySelector('.popup');
-    if (popup) {
-      popup.remove();
-    }
+
+    cleanAllPinActiveClass();
+    pin.classList.add('map__pin--active');
+
     var index = pin.dataset.index;
     addCard(index);
-    closePopup();
   });
-
-  var closePopup = function () {
-    var popup = document.querySelector('.popup');
-    var popupClose = popup.querySelector('.popup__close');
-
-    popupClose.addEventListener('click', function () {
-      popup.remove();
-    });
-
-    popupClose.addEventListener('keydown', function (evt) {
-      if (evt.key === 'Enter') {
-        popup.remove();
-      }
-    });
-
-    document.addEventListener('keydown', function (evt) {
-      if (evt.key === 'Escape') {
-        popup.remove();
-      }
-    });
-  };
 
   // Функция для создания иконок с фотографиями
   var mergePhotosAndCard = function (photos, photosContainer) {
@@ -152,10 +139,43 @@
     return element;
   };
 
+  // Функция добавления карточки
   var addCard = function (index) {
+    var popup = document.querySelector('.popup');
+    if (popup) {
+      popup.remove();
+    }
+
     var cardElement = cardTemplate.cloneNode(true);
     var cardsFragment = document.createDocumentFragment();
-    cardsFragment.appendChild(getCard(window.mock.adverts[index], cardElement));
+    cardsFragment.appendChild(getCard(window.backend.offers[index], cardElement));
     offersMap.insertBefore(cardsFragment, mapFiltersContainer);
+
+    addListenersOnPopup();
+  };
+
+  // Добавление обработчиков на карточку объявления
+  var addListenersOnPopup = function () {
+    var popup = document.querySelector('.popup');
+    var popupClose = popup.querySelector('.popup__close');
+
+    popupClose.addEventListener('click', function () {
+      popup.remove();
+      cleanAllPinActiveClass();
+    });
+
+    popupClose.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Enter') {
+        popup.remove();
+        cleanAllPinActiveClass();
+      }
+    });
+
+    document.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Escape') {
+        popup.remove();
+        cleanAllPinActiveClass();
+      }
+    });
   };
 })();

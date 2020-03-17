@@ -24,12 +24,12 @@
   };
 
   // Функция добавления меток во фрагмент и затем на страницу
-  var addPins = function () {
+  var addPins = function (data) {
     var pinsFragment = document.createDocumentFragment();
-    for (var i = 0; i < window.mock.adverts.length; i++) {
+    for (var i = 0; i < data.length; i++) {
       var pinElement = pinTemplate.cloneNode(true);
       offersMap.appendChild(pinElement);
-      pinsFragment.appendChild(getPin(window.mock.adverts[i], pinElement, pinWidth, pinHeight, i));
+      pinsFragment.appendChild(getPin(data[i], pinElement, pinWidth, pinHeight, i));
     }
     mapPins.appendChild(pinsFragment);
   };

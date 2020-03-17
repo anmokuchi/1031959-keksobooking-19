@@ -35,11 +35,21 @@
     return titles[(number % 100 > 4 && number % 100 < 20) ? 2 : cases[(number % 10 < 5) ? number % 10 : 5]];
   };
 
+  // Внешний вид сообщения об ошибке при загрузке с сервера (временно здесь и в таком виде)
+  var errorTemplate = document.querySelector('#error').content.querySelector('.error');
+  var onError = function (message) {
+    var errorElement = errorTemplate.cloneNode(true);
+    var errorMessage = errorElement.querySelector('.error__message');
+    errorMessage.textContent = message;
+    document.body.appendChild(errorElement);
+  };
+
   window.util = {
     randomArrayElement: randomArrayElement,
     randomIntInclusive: randomIntInclusive,
     randomArray: randomArray,
     declineTitle: declineTitle,
+    onError: onError,
   };
 })();
 
