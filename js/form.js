@@ -1,16 +1,28 @@
 'use strict';
 
 (function () {
-  // Необходимые DOM-элементы
-  var adForm = document.querySelector('.ad-form'); // форма объявления
-  var houseType = document.querySelector('#type'); // выпадающее меню типа жилья
-  var formPriceInput = adForm.querySelector('#price'); // инпут цены
-  var roomsNumber = adForm.querySelector('#room_number'); // выпадающее меню количества комнат
-  var guestsNumber = adForm.querySelector('#capacity'); // выпадающее меню количества гостей
-  var timeIn = adForm.querySelector('#timein'); // выпадающее меню времени заезда
-  var timeOut = adForm.querySelector('#timeout'); // выпадающее меню времени выезда
+  var selector = {
+    adForm: '.ad-form',
+    houseType: '#type',
+    price: '#price',
+    roomNumber: '#room_number',
+    capacity: '#capacity',
+    timeIn: '#timein',
+    timeOut: '#timeout',
+  };
 
-  // Валидация цены в зависимости от типа жилья
+  var domElement = {
+    adForm: document.querySelector(selector.adForm),
+    houseType: document.querySelector(selector.houseType),
+    formPriceInput: document.querySelector(selector.price),
+    roomsNumber: document.querySelector(selector.roomNumber),
+    guestsNumber: document.querySelector(selector.capacity),
+    timeIn: document.querySelector(selector.timeIn),
+    timeOut: document.querySelector(selector.timeOut),
+  };
+
+  /* ------------------------------ ВАЛИДАЦИЯ ЦЕНЫ И ТИПА ЖИЛЬЯ ------------------------------ */
+
   var houseTypeMinValue = {
     bungalo: {min: 0},
     flat: {min: 1000},
@@ -18,13 +30,14 @@
     palace: {min: 10000},
   };
 
-  houseType.addEventListener('change', function () {
-    var value = houseTypeMinValue[houseType.value].min;
-    formPriceInput.setAttribute('min', value);
-    formPriceInput.placeholder = value;
+  domElement.houseType.addEventListener('change', function () {
+    var value = houseTypeMinValue[domElement.houseType.value].min;
+    domElement.formPriceInput.setAttribute('min', value);
+    domElement.formPriceInput.placeholder = value;
   });
 
-  // Валидация соответствия количества гостей (спальных мест) с количеством комнат
+  /* ------------------------------ ВАЛИДАЦИЯ КОЛИЧЕСТВА КОМНАТ И КОЛИЧЕСТВА ГОСТЕЙ ------------------------------ */
+
   var roomSetting = {
     1: {
       minGuest: 1,
@@ -49,31 +62,33 @@
   };
 
   var roomsNumberValidity = function () {
-    var roomValue = roomsNumber.value;
-    var guestValue = guestsNumber.value;
+    var roomValue = domElement.roomsNumber.value;
+    var guestValue = domElement.guestsNumber.value;
     var maxGuest = roomSetting[roomValue].maxGuest;
     var minGuest = roomSetting[roomValue].minGuest;
+
     if (guestValue >= minGuest && guestValue <= maxGuest) {
-      guestsNumber.setCustomValidity('');
+      domElement.guestsNumber.setCustomValidity('');
     } else {
-      guestsNumber.setCustomValidity(roomSetting[roomValue].errorMessage);
+      domElement.guestsNumber.setCustomValidity(roomSetting[roomValue].errorMessage);
     }
   };
 
   roomsNumberValidity();
 
-  roomsNumber.addEventListener('change', roomsNumberValidity);
-  guestsNumber.addEventListener('change', roomsNumberValidity);
+  domElement.roomsNumber.addEventListener('change', roomsNumberValidity);
+  domElement.guestsNumber.addEventListener('change', roomsNumberValidity);
 
-  // Синхронизация времени въезда и времени выезда
+  /* ------------------------------ СИНХРОНИЗАЦИЯ ВРЕМЕНИ ВЪЕЗДА И ВРЕМЕНИ ВЫЕЗДА ------------------------------ */
+
   var onCheckInTimeChange = function () {
-    timeOut.value = timeIn.value;
+    domElement.timeOut.value = domElement.timeIn.value;
   };
 
   var onCheckOutTimeChange = function () {
-    timeIn.value = timeOut.value;
+    domElement.timeIn.value = domElement.timeOut.value;
   };
 
-  timeIn.addEventListener('change', onCheckInTimeChange);
-  timeOut.addEventListener('change', onCheckOutTimeChange);
+  domElement.timeIn.addEventListener('change', onCheckInTimeChange);
+  domElement.timeOut.addEventListener('change', onCheckOutTimeChange);
 })();

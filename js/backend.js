@@ -35,8 +35,6 @@
     });
   };
 
-  var offers = [];
-
   window.backend = {
     load: function (onLoad, onError) {
       sendRequest({
@@ -51,6 +49,5 @@
     //     data: data,
     //   }, onLoad, onError);
     // },
-    offers: offers,
   };
 })();
