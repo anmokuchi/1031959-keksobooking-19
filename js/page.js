@@ -9,6 +9,11 @@
     mapFilters: '.map__filters',
     address: '#address',
     mapPinMain: '.map__pin--main',
+    successTemplate: '#success',
+    success: '.success',
+    errorTemplate: '#error',
+    error: '.error',
+    errorButton: '.error__button',
   };
 
   var cssClass = {
@@ -205,4 +210,69 @@
   };
 
   pinMain.element.addEventListener('mousedown', onPinMain);
+
+  /* ------------------------------ ОТПРАВКА ФОРМЫ ОБЪЯВЛЕНИЯ ------------------------------ */
+
+  // Сообщение об успешной отправке формы
+  var successTemplate = document.querySelector(selector.successTemplate).content.querySelector(selector.success);
+  var successElement = successTemplate.cloneNode(true);
+  var onLoad = function () {
+    document.body.appendChild(successElement);
+    deactivatePage();
+    addListenersOnSuccessMessage();
+  };
+
+  var removeSuccessMessage = function () {
+    document.body.removeChild(successElement);
+  };
+
+  var addListenersOnSuccessMessage = function () {
+    document.addEventListener('click', function () {
+      removeSuccessMessage();
+    });
+
+    document.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Escape') {
+        removeSuccessMessage();
+      }
+    });
+  };
+
+  // Сообщение об ошибке отправки формы
+  var errorTemplate = document.querySelector(selector.errorTemplate).content.querySelector(selector.error);
+  var errorElement = errorTemplate.cloneNode(true);
+  var onError = function () {
+    document.body.appendChild(errorElement);
+    addListenersOnErrorMessage();
+  };
+
+  var removeErrorMessage = function () {
+    document.body.removeChild(errorElement);
+  };
+
+  var addListenersOnErrorMessage = function () {
+    var errorButton = document.querySelector(selector.errorButton);
+
+    document.addEventListener('click', function () {
+      removeErrorMessage();
+    });
+
+    errorButton.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Enter') {
+        removeErrorMessage();
+      }
+    });
+
+    document.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Escape') {
+        removeErrorMessage();
+      }
+    });
+  };
+
+  // Обработчик отправки данных
+  domElement.adForm.addEventListener('submit', function (evt) {
+    window.backend.save(new FormData(domElement.adForm), onLoad, onError);
+    evt.preventDefault();
+  });
 })();
