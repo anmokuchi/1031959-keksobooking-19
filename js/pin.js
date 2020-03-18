@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var MAP_MAX_PINS = 5;
+
   var selector = {
     map: '.map',
     pinTemplate: '#pin',
@@ -44,17 +46,6 @@
 
   /* ------------------------------ ОТРИСОВКА ВСЕХ МЕТОК НА КАРТЕ ------------------------------ */
 
-  // Отрисовка всех меток
-  var showPins = function (data) {
-    removePins();
-
-    var pinsFragment = document.createDocumentFragment();
-    for (var i = 0; i < data.length; i++) {
-      pinsFragment.appendChild(getPin(data[i], i));
-    }
-    domElement.mapPins.appendChild(pinsFragment);
-  };
-
   // Удаление меток с карты
   var removePins = function () {
     var userPins = document.querySelectorAll(selector.mapPin);
@@ -63,6 +54,18 @@
         pin.remove();
       }
     });
+  };
+
+  // Отрисовка всех меток
+  var showPins = function (data) {
+    removePins();
+
+    var pinsFragment = document.createDocumentFragment();
+    var pinsOnMap = data.length > MAP_MAX_PINS ? MAP_MAX_PINS : data.length;
+    for (var i = 0; i < pinsOnMap; i++) {
+      pinsFragment.appendChild(getPin(data[i], i));
+    }
+    domElement.mapPins.appendChild(pinsFragment);
   };
 
   /* ------------------------------ ОБРАБОТЧИКИ И СТАТУС МЕТОК ------------------------------ */

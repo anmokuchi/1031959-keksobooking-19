@@ -15,6 +15,7 @@
     error: '.error',
     errorButton: '.error__button',
     adFormReset: '.ad-form__reset',
+    housingType: '#housing-type',
   };
 
   var cssClass = {
@@ -30,6 +31,7 @@
     mapFilters: document.querySelector(selector.mapFilters),
     addressInput: document.querySelector(selector.address),
     resetButton: document.querySelector(selector.adFormReset),
+    housingTypeFilter: document.querySelector(selector.housingType),
   };
 
   /* ------------------------------ КООРДИНАТЫ ГЛАВНОЙ МЕТКИ ------------------------------ */
@@ -104,7 +106,9 @@
   // Коллбэк успешной загрузки данных
   var onSuccess = function (data) {
     window.data = data;
+    window.dataToShow = data;
     window.pin.showPins(window.data);
+    filterHouseTypeData();
   };
 
   // Функция активации страницы
@@ -141,6 +145,27 @@
 
   pinMain.element.addEventListener('mousedown', onPinMainLeftButtonClick);
   pinMain.element.addEventListener('keydown', onPinMainEnterPress);
+
+  /* ------------------------------ ФИЛЬТРАЦИЯ МЕТОК И ОБЪЯВЛЕНИЙ ------------------------------ */
+
+  var filterHouseTypeData = function (data) {
+    var newData = data.slice();
+    var housingTypeFilterValue = domElement.housingTypeFilter;
+
+    if (housingTypeFilterValue === 'any') {
+      window.pin.showPins(newData);
+    } else {
+      var sameHouseTypes = newData.filter(function (advert) {
+        return advert.offer.type === housingTypeFilterValue;
+      });
+      window.pin.showPins(sameHouseTypes);
+    }
+    window.dataToShow = newData;
+  };
+
+  domElement.housingTypeFilter.addEventListener('change', function () {
+    filterHouseTypeData();
+  });
 
   /* ------------------------------ ПЕРЕМЕЩЕНИЕ ГЛАВНОЙ МЕТКИ ПО КАРТЕ ------------------------------ */
 
