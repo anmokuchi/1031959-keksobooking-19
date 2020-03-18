@@ -1,24 +1,55 @@
 'use strict';
 
 (function () {
-  // Необходимые DOM-элементы
-  var offersMap = document.querySelector('.map'); // карта с объявлениями
-  var adForm = document.querySelector('.ad-form'); // форма объявления
-  var adFormHeader = document.querySelector('.ad-form-header'); // заголовок формы
-  var adFormElements = document.querySelectorAll('.ad-form__element'); // элементы формы
-  var mapFilters = document.querySelector('.map__filters'); // форма с фильтрами
-  var addressInput = document.querySelector('#address'); // инпут адреса
+  var selector = {
+    map: '.map',
+    adForm: '.ad-form',
+    adFormHeader: '.ad-form-header',
+    adFormElement: '.ad-form__element',
+    mapFilters: '.map__filters',
+    address: '#address',
+    mapPinMain: '.map__pin--main',
+    successTemplate: '#success',
+    success: '.success',
+    errorTemplate: '#error',
+    error: '.error',
+    errorButton: '.error__button',
+    adFormReset: '.ad-form__reset',
+  };
+
+  var cssClass = {
+    mapFaded: 'map--faded',
+    adFormDisabled: 'ad-form--disabled',
+  };
+
+  var domElement = {
+    offersMap: document.querySelector(selector.map),
+    adForm: document.querySelector(selector.adForm),
+    adFormHeader: document.querySelector(selector.adFormHeader),
+    adFormElements: document.querySelectorAll(selector.adFormElement),
+    mapFilters: document.querySelector(selector.mapFilters),
+    addressInput: document.querySelector(selector.address),
+    resetButton: document.querySelector(selector.adFormReset),
+  };
+
+  /* ------------------------------ КООРДИНАТЫ ГЛАВНОЙ МЕТКИ ------------------------------ */
 
   var ClientSize = {
     MIN_Y: 130,
     MAX_Y: 630,
   };
 
-  var pinMain = {// главная метка
-    element: document.querySelector('.map__pin--main'),
+  var pinMain = {
+    element: document.querySelector(selector.mapPinMain),
     width: 65,
     height: 65,
     pointHeight: 15,
+  };
+
+  // Положение главной метки по умолчанию
+  var setDefaultPinMainPosition = function () {
+    pinMain.element.style.left = '570px';
+    pinMain.element.style.top = '375px';
   };
 
   // Функция получения координат главной метки
@@ -35,50 +66,85 @@
     return Math.round(pinMainLocationX) + ', ' + Math.round(pinMainLocationY);
   };
 
-  // Добавление атрибута disabled для элементов fieldset (блокируются поля формы в группе)
-  adFormHeader.setAttribute('disabled', 'disabled'); // для заголовка формы
-  mapFilters.setAttribute('disabled', 'disabled'); // для формы с фильтрами
-  adFormElements.forEach(function (element) { // для всех элементов формы
-    element.setAttribute('disabled', 'disabled');
-  });
+  /* ------------------------------ НЕАКТИВНЫЙ РЕЖИМ СТРАНИЦЫ ------------------------------ */
 
-  // Заполнение поля адреса координатами центра метки в неактивном состоянии
-  addressInput.value = getMainPinCoordinatesValue(pinMain, false);
-
-  var onSuccess = function (data) {
-    window.backend.offers = data;
-    window.pin.addPins(window.backend.offers);
+  // Перевод формы в неактивный режим
+  var deactivateForm = function () {
+    domElement.adFormElements.forEach(function (element) {
+      element.setAttribute('disabled', 'disabled');
+    });
   };
 
-  // Функция активации страницы
-  var activatePage = function () {
-    offersMap.classList.remove('map--faded'); // удаление класса map--faded у карты с объявлениями для ее активации
-    adForm.classList.remove('ad-form--disabled'); // удаление класса ad-form--disabled у формы объявления для ее активации
-    // window.pin.addPins(); // вызов функции добавления меток
-    window.backend.load(onSuccess, window.util.onError);
-    addressInput.value = getMainPinCoordinatesValue(pinMain, true); // получение координат метки
-    adFormHeader.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с заголовка формы
-    mapFilters.removeAttribute('disabled', 'disabled'); // удаление атрибута disabled с формы с фильтрами
-    adFormElements.forEach(function (element) { // удаление атрибута disabled с элементов формы
+  // Функция деактивации страницы
+  var deactivatePage = function () {
+    domElement.offersMap.classList.add(cssClass.mapFaded);
+    domElement.mapFilters.setAttribute('disabled', 'disabled');
+    window.pin.removePins();
+    window.card.closeCard();
+    setDefaultPinMainPosition();
+
+    domElement.adForm.classList.add(cssClass.adFormDisabled);
+    domElement.adFormHeader.setAttribute('disabled', 'disabled');
+    domElement.adForm.reset();
+    deactivateForm();
+    domElement.addressInput.value = getMainPinCoordinatesValue(pinMain, false);
+  };
+
+  deactivatePage();
+
+  /* ------------------------------ АКТИВНЫЙ РЕЖИМ СТРАНИЦЫ ------------------------------ */
+
+  // Перевод формы в активный режим
+  var activateForm = function () {
+    domElement.adFormElements.forEach(function (element) {
       element.removeAttribute('disabled', 'disabled');
     });
   };
 
+  // Коллбэк успешной загрузки данных
+  var onSuccess = function (data) {
+    window.data = data;
+    window.pin.showPins(window.data);
+  };
+
+  // Функция активации страницы
+  var activatePage = function () {
+    domElement.offersMap.classList.remove(cssClass.mapFaded);
+    domElement.mapFilters.removeAttribute('disabled', 'disabled');
+    window.backend.load(onSuccess, window.util.onError);
+
+    domElement.adForm.classList.remove(cssClass.adFormDisabled);
+    domElement.adFormHeader.removeAttribute('disabled', 'disabled');
+    activateForm();
+    domElement.addressInput.value = getMainPinCoordinatesValue(pinMain, true);
+  };
+
+  window.pin.onPinClick(function (index) {
+    window.card.showCard(index);
+  });
+
+  /* ------------------------------ ОБРАБОТЧИКИ АКТИВАЦИИ ------------------------------ */
+
   // Обработчик активации страницы по нажатию на левую клавишу мыши
-  pinMain.element.addEventListener('mousedown', function (evt) {
+  var onPinMainLeftButtonClick = function (evt) {
     if (evt.button === 0) {
       activatePage();
     }
-  });
+  };
 
   // Обработчик активации страницы по нажатию на Enter
-  pinMain.element.addEventListener('keydown', function (evt) {
+  var onPinMainEnterPress = function (evt) {
     if (evt.key === 'Enter') {
       activatePage();
     }
-  });
+  };
 
-  // Обработчик перетаскивания главного пина
+  pinMain.element.addEventListener('mousedown', onPinMainLeftButtonClick);
+  pinMain.element.addEventListener('keydown', onPinMainEnterPress);
+
+  /* ------------------------------ ПЕРЕМЕЩЕНИЕ ГЛАВНОЙ МЕТКИ ПО КАРТЕ ------------------------------ */
+
+  // Обработчик перетаскивания главной метки
   var onPinMain = function (evt) {
     evt.preventDefault();
 
@@ -87,7 +153,7 @@
       y: evt.clientY
     };
 
-    var clientWidth = offersMap.clientWidth;
+    var clientWidth = domElement.offersMap.clientWidth;
 
     var pinMainPointCoords = {
       x: pinMain.width / 2,
@@ -128,7 +194,7 @@
         pinMain.element.style.left = (clientWidth - pinMainPointCoords.x) + 'px';
       }
 
-      addressInput.value = getMainPinCoordinatesValue(pinMain, true);
+      domElement.addressInput.value = getMainPinCoordinatesValue(pinMain, true);
     };
 
     var onMouseUp = function (upEvt) {
@@ -143,4 +209,83 @@
   };
 
   pinMain.element.addEventListener('mousedown', onPinMain);
+
+  /* ------------------------------ ОБРАБОТЧИК ДЛЯ ОЧИСТКИ ФОРМЫ ------------------------------ */
+
+  var onResetButtonClick = function () {
+    deactivatePage();
+  };
+
+  domElement.resetButton.addEventListener('click', onResetButtonClick);
+
+  domElement.resetButton.addEventListener('keydown', function (evt) {
+    if (evt.key === 'Enter') {
+      deactivatePage();
+    }
+  });
+
+  /* ------------------------------ ОТПРАВКА ФОРМЫ ОБЪЯВЛЕНИЯ ------------------------------ */
+
+  // Сообщение об успешной отправке формы
+  var successTemplate = document.querySelector(selector.successTemplate).content.querySelector(selector.success);
+  var successElement = successTemplate.cloneNode(true);
+  var onLoad = function () {
+    document.body.appendChild(successElement);
+    deactivatePage();
+    addListenersOnSuccessMessage();
+  };
+
+  var removeSuccessMessage = function () {
+    document.body.removeChild(successElement);
+  };
+
+  var addListenersOnSuccessMessage = function () {
+    document.addEventListener('click', function () {
+      removeSuccessMessage();
+    });
+
+    document.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Escape') {
+        removeSuccessMessage();
+      }
+    });
+  };
+
+  // Сообщение об ошибке отправки формы
+  var errorTemplate = document.querySelector(selector.errorTemplate).content.querySelector(selector.error);
+  var errorElement = errorTemplate.cloneNode(true);
+  var onError = function () {
+    document.body.appendChild(errorElement);
+    addListenersOnErrorMessage();
+  };
+
+  var removeErrorMessage = function () {
+    document.body.removeChild(errorElement);
+  };
+
+  var addListenersOnErrorMessage = function () {
+    var errorButton = document.querySelector(selector.errorButton);
+
+    document.addEventListener('click', function () {
+      removeErrorMessage();
+    });
+
+    errorButton.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Enter') {
+        removeErrorMessage();
+      }
+    });
+
+    document.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Escape') {
+        removeErrorMessage();
+      }
+    });
+  };
+
+  // Обработчик отправки данных
+  domElement.adForm.addEventListener('submit', function (evt) {
+    window.backend.save(new FormData(domElement.adForm), onLoad, onError);
+    evt.preventDefault();
+  });
 })();

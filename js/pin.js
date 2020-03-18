@@ -1,40 +1,100 @@
 'use strict';
 
 (function () {
-  var offersMap = document.querySelector('.map'); // карта с объявлениями
-  var pinTemplate = document.querySelector('#pin').content.querySelector('button'); // шаблон метки объявления
-  var mapPins = document.querySelector('.map__pins'); // элемент, куда добавлять метки объявлений
-
-  // Размеры меток
-  var pinWidth = 50; // ширина обычной метки
-  var pinHeight = 70; // высота обычной метки
-
-  // Функция отрисовки метки
-  var getPin = function (offer, element, width, height, index) {
-    var left = offer.location.x - (width / 2);
-    var top = offer.location.y - height;
-    var pinPosition = 'left: ' + left + 'px; top: ' + top + 'px;';
-
-    element.style = pinPosition;
-    element.querySelector('img').src = offer.author.avatar;
-    element.querySelector('img').alt = offer.offer.title;
-    element.dataset.index = index;
-
-    return element;
+  var selector = {
+    map: '.map',
+    pinTemplate: '#pin',
+    pinButton: 'button',
+    mapPins: '.map__pins',
+    mapPin: '.map__pin',
   };
 
-  // Функция добавления меток во фрагмент и затем на страницу
-  var addPins = function (data) {
+  var cssClass = {
+    mapPinActive: 'map__pin--active',
+    mapPinMapPinActive: 'map__pin map__pin--active',
+    mapPinMain: 'map__pin--main',
+  };
+
+  var domElement = {
+    offersMap: document.querySelector(selector.map),
+    pinTemplate: document.querySelector(selector.pinTemplate).content.querySelector(selector.pinButton),
+    mapPins: document.querySelector(selector.mapPins),
+  };
+
+  var pinSize = {
+    width: 50,
+    height: 70,
+  };
+
+  /* ------------------------------ СОЗДАНИЕ ОДНОЙ МЕТКИ ПО ШАБЛОНУ ------------------------------ */
+
+  var getPin = function (offer, index) {
+    var left = offer.location.x - (pinSize.width / 2);
+    var top = offer.location.y - pinSize.height;
+    var pinPosition = 'left: ' + left + 'px; top: ' + top + 'px;';
+
+    var pinElement = domElement.pinTemplate.cloneNode(true);
+    pinElement.style = pinPosition;
+    pinElement.querySelector('img').src = offer.author.avatar;
+    pinElement.querySelector('img').alt = offer.offer.title;
+    pinElement.dataset.index = index;
+
+    return pinElement;
+  };
+
+  /* ------------------------------ ОТРИСОВКА ВСЕХ МЕТОК НА КАРТЕ ------------------------------ */
+
+  // Отрисовка всех меток
+  var showPins = function (data) {
+    removePins();
+
     var pinsFragment = document.createDocumentFragment();
     for (var i = 0; i < data.length; i++) {
-      var pinElement = pinTemplate.cloneNode(true);
-      offersMap.appendChild(pinElement);
-      pinsFragment.appendChild(getPin(data[i], pinElement, pinWidth, pinHeight, i));
+      pinsFragment.appendChild(getPin(data[i], i));
     }
-    mapPins.appendChild(pinsFragment);
+    domElement.mapPins.appendChild(pinsFragment);
+  };
+
+  // Удаление меток с карты
+  var removePins = function () {
+    var userPins = document.querySelectorAll(selector.mapPin);
+    userPins.forEach(function (pin) {
+      if (!pin.classList.contains(cssClass.mapPinMain)) {
+        pin.remove();
+      }
+    });
+  };
+
+  /* ------------------------------ ОБРАБОТЧИКИ И СТАТУС МЕТОК ------------------------------ */
+
+  // Функция удаления активного класса с меток
+  var userPinsLiveCollection = domElement.offersMap.getElementsByClassName(cssClass.mapPinMapPinActive);
+  var cleanAllPinActiveClass = function () {
+    Array.from(userPinsLiveCollection).forEach(function (pin) {
+      pin.classList.remove(cssClass.mapPinActive);
+    });
+  };
+
+  // Обработчик открытия карточки по нажатию на метку
+  var onPinClick = function (callback) {
+    domElement.offersMap.addEventListener('click', function (evt) {
+      var pin = evt.target.closest('.map__pin:not(.map__pin--main)');
+      if (!pin) {
+        return;
+      }
+
+      cleanAllPinActiveClass();
+      pin.classList.add(cssClass.mapPinActive);
+
+      var index = pin.dataset.index;
+      callback(index);
+    });
   };
 
   window.pin = {
-    addPins: addPins,
+    showPins: showPins,
+    removePins: removePins,
+    cleanAllPinActiveClass: cleanAllPinActiveClass,
+    onPinClick: onPinClick,
   };
 })();
