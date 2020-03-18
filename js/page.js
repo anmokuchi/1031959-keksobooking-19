@@ -107,8 +107,8 @@
   var onSuccess = function (data) {
     window.data = data;
     window.dataToShow = data;
-    window.pin.showPins(window.data);
-    filterHouseTypeData();
+    window.pin.showPins(window.dataToShow);
+    // filterHouseTypeData();
   };
 
   // Функция активации страницы
@@ -148,19 +148,20 @@
 
   /* ------------------------------ ФИЛЬТРАЦИЯ МЕТОК И ОБЪЯВЛЕНИЙ ------------------------------ */
 
-  var filterHouseTypeData = function (data) {
-    var newData = data.slice();
-    var housingTypeFilterValue = domElement.housingTypeFilter;
+  var filterHouseTypeData = function () {
+    var newData = window.data.slice();
+    var housingTypeFilterValue = domElement.housingTypeFilter.value;
 
     if (housingTypeFilterValue === 'any') {
+      window.dataToShow = newData;
       window.pin.showPins(newData);
     } else {
       var sameHouseTypes = newData.filter(function (advert) {
         return advert.offer.type === housingTypeFilterValue;
       });
+      window.dataToShow = sameHouseTypes;
       window.pin.showPins(sameHouseTypes);
     }
-    window.dataToShow = newData;
   };
 
   domElement.housingTypeFilter.addEventListener('change', function () {
