@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var MAP_MAX_PINS = 5;
+
   var selector = {
     map: '.map',
     adForm: '.ad-form',
@@ -106,9 +108,8 @@
   // Коллбэк успешной загрузки данных
   var onSuccess = function (data) {
     window.data = data;
-    window.dataToShow = data;
-    window.pin.showPins(window.dataToShow);
-    // filterHouseTypeData();
+    // window.pin.showPins(data);
+    filterHouseTypeData(data);
   };
 
   // Функция активации страницы
@@ -148,24 +149,30 @@
 
   /* ------------------------------ ФИЛЬТРАЦИЯ МЕТОК И ОБЪЯВЛЕНИЙ ------------------------------ */
 
-  var filterHouseTypeData = function () {
-    var newData = window.data.slice();
+  var filterHouseTypeData = function (data) {
+    var indexesToShow = [];
     var housingTypeFilterValue = domElement.housingTypeFilter.value;
-
     if (housingTypeFilterValue === 'any') {
-      window.dataToShow = newData;
-      window.pin.showPins(newData);
+      for (var i = 0; i < MAP_MAX_PINS; i++) {
+        indexesToShow.push(i);
+      }
+      window.pin.showPins(data, indexesToShow);
     } else {
-      var sameHouseTypes = newData.filter(function (advert) {
-        return advert.offer.type === housingTypeFilterValue;
-      });
-      window.dataToShow = sameHouseTypes;
-      window.pin.showPins(sameHouseTypes);
+      indexesToShow = data.reduce(function (acc, advert, index) {
+
+        if (advert.offer.type === housingTypeFilterValue) {
+          acc.push(index);
+        }
+
+        return acc;
+      }, []);
+      window.pin.showPins(data, indexesToShow);
     }
   };
 
   domElement.housingTypeFilter.addEventListener('change', function () {
-    filterHouseTypeData();
+    window.card.closeCard();
+    filterHouseTypeData(window.data);
   });
 
   /* ------------------------------ ПЕРЕМЕЩЕНИЕ ГЛАВНОЙ МЕТКИ ПО КАРТЕ ------------------------------ */

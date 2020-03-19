@@ -1,8 +1,6 @@
 'use strict';
 
 (function () {
-  var MAP_MAX_PINS = 5;
-
   var selector = {
     map: '.map',
     pinTemplate: '#pin',
@@ -57,15 +55,17 @@
   };
 
   // Отрисовка всех меток
-  var showPins = function (data) {
+  var showPins = function (data, indexesToShow) {
     removePins();
+    indexesToShow.forEach(function (element) {
+      var pinsFragment = document.createDocumentFragment();
+      pinsFragment.appendChild(getPin(data[element], element));
+      domElement.mapPins.appendChild(pinsFragment);
+    });
 
-    var pinsFragment = document.createDocumentFragment();
-    var pinsOnMap = data.length > MAP_MAX_PINS ? MAP_MAX_PINS : data.length;
-    for (var i = 0; i < pinsOnMap; i++) {
-      pinsFragment.appendChild(getPin(data[i], i));
-    }
-    domElement.mapPins.appendChild(pinsFragment);
+    // var pinsOnMap = data.length > MAP_MAX_PINS ? MAP_MAX_PINS : data.length;
+    // for (var i = 0; i < pinsOnMap; i++) {
+    // }
   };
 
   /* ------------------------------ ОБРАБОТЧИКИ И СТАТУС МЕТОК ------------------------------ */
