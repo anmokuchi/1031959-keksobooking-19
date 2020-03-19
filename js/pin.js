@@ -44,17 +44,6 @@
 
   /* ------------------------------ ОТРИСОВКА ВСЕХ МЕТОК НА КАРТЕ ------------------------------ */
 
-  // Отрисовка всех меток
-  var showPins = function (data) {
-    removePins();
-
-    var pinsFragment = document.createDocumentFragment();
-    for (var i = 0; i < data.length; i++) {
-      pinsFragment.appendChild(getPin(data[i], i));
-    }
-    domElement.mapPins.appendChild(pinsFragment);
-  };
-
   // Удаление меток с карты
   var removePins = function () {
     var userPins = document.querySelectorAll(selector.mapPin);
@@ -62,6 +51,17 @@
       if (!pin.classList.contains(cssClass.mapPinMain)) {
         pin.remove();
       }
+    });
+  };
+
+  // Отрисовка всех меток
+  var showPins = function (data, indexesToShow) {
+    removePins();
+
+    indexesToShow.forEach(function (element) {
+      var pinsFragment = document.createDocumentFragment();
+      pinsFragment.appendChild(getPin(data[element], element));
+      domElement.mapPins.appendChild(pinsFragment);
     });
   };
 
