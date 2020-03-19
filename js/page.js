@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var MAP_MAX_PINS = 5;
+
   var selector = {
     map: '.map',
     adForm: '.ad-form',
@@ -15,6 +17,7 @@
     error: '.error',
     errorButton: '.error__button',
     adFormReset: '.ad-form__reset',
+    housingType: '#housing-type',
   };
 
   var cssClass = {
@@ -30,6 +33,7 @@
     mapFilters: document.querySelector(selector.mapFilters),
     addressInput: document.querySelector(selector.address),
     resetButton: document.querySelector(selector.adFormReset),
+    housingTypeFilter: document.querySelector(selector.housingType),
   };
 
   /* ------------------------------ КООРДИНАТЫ ГЛАВНОЙ МЕТКИ ------------------------------ */
@@ -104,7 +108,7 @@
   // Коллбэк успешной загрузки данных
   var onSuccess = function (data) {
     window.data = data;
-    window.pin.showPins(window.data);
+    filterHouseTypeData(data);
   };
 
   // Функция активации страницы
@@ -141,6 +145,34 @@
 
   pinMain.element.addEventListener('mousedown', onPinMainLeftButtonClick);
   pinMain.element.addEventListener('keydown', onPinMainEnterPress);
+
+  /* ------------------------------ ФИЛЬТРАЦИЯ МЕТОК И ОБЪЯВЛЕНИЙ ------------------------------ */
+
+  var filterHouseTypeData = function (data) {
+    var indexesToShow = [];
+    var housingTypeFilterValue = domElement.housingTypeFilter.value;
+    if (housingTypeFilterValue === 'any') {
+      for (var i = 0; i < MAP_MAX_PINS; i++) {
+        indexesToShow.push(i);
+      }
+      window.pin.showPins(data, indexesToShow);
+    } else {
+      indexesToShow = data.reduce(function (acc, advert, index) {
+
+        if (advert.offer.type === housingTypeFilterValue) {
+          acc.push(index);
+        }
+
+        return acc;
+      }, []);
+      window.pin.showPins(data, indexesToShow);
+    }
+  };
+
+  domElement.housingTypeFilter.addEventListener('change', function () {
+    window.card.closeCard();
+    filterHouseTypeData(window.data);
+  });
 
   /* ------------------------------ ПЕРЕМЕЩЕНИЕ ГЛАВНОЙ МЕТКИ ПО КАРТЕ ------------------------------ */
 
