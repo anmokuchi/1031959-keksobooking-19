@@ -221,6 +221,9 @@
         && filterByFeatures(advert)) {
         acc.push(index);
       }
+      if (acc.length >= MAP_MAX_PINS) {
+        acc.splice(5);
+      }
 
       return acc;
     }, []);
