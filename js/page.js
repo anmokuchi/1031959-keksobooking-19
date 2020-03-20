@@ -2,6 +2,7 @@
 
 (function () {
   var MAP_MAX_PINS = 5;
+  var DEBOUNCE_INTERVAL = 500; // ms
 
   var selector = {
     map: '.map',
@@ -27,6 +28,7 @@
   var cssClass = {
     mapFaded: 'map--faded',
     adFormDisabled: 'ad-form--disabled',
+    hidden: 'hidden',
   };
 
   var domElement = {
@@ -118,7 +120,7 @@
     var loadErrorElement = loadErrorTemplate.cloneNode(true);
 
     var loadErrorButton = loadErrorElement.querySelector(selector.errorButton);
-    loadErrorButton.classList.add('hidden');
+    loadErrorButton.classList.add(cssClass.hidden);
 
     var loadErrorMessage = loadErrorElement.querySelector(selector.errorMessage);
     loadErrorMessage.textContent = message;
@@ -166,6 +168,17 @@
 
   pinMain.element.addEventListener('mousedown', onPinMainLeftButtonClick);
   pinMain.element.addEventListener('keydown', onPinMainEnterPress);
+
+  /* ------------------------------ УСТРАНЕНИЕ ДРЕБЕЗГА ------------------------------ */
+
+  var lastTimeout;
+
+  var debounce = function (callback) {
+    if (lastTimeout) {
+      window.clearTimeout(lastTimeout);
+    }
+    lastTimeout = window.setTimeout(callback, DEBOUNCE_INTERVAL);
+  };
 
   /* ------------------------------ ФИЛЬТРАЦИЯ МЕТОК И ОБЪЯВЛЕНИЙ ------------------------------ */
 
@@ -245,10 +258,14 @@
   };
 
   // Обработчик фильтрации объявлений
-  domElement.mapFilters.addEventListener('change', function () {
-    window.card.closeCard();
-    filterAdverts(window.data);
-  });
+  var onFiltersChange = function () {
+    debounce(function () {
+      window.card.closeCard();
+      filterAdverts(window.data);
+    });
+  };
+
+  domElement.mapFilters.addEventListener('change', onFiltersChange);
 
   /* ------------------------------ ПЕРЕМЕЩЕНИЕ ГЛАВНОЙ МЕТКИ ПО КАРТЕ ------------------------------ */
 
