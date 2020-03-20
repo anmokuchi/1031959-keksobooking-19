@@ -18,6 +18,9 @@
     errorButton: '.error__button',
     adFormReset: '.ad-form__reset',
     housingType: '#housing-type',
+    housingPrice: '#housing-price',
+    housingRooms: '#housing-rooms',
+    housingGuests: '#housing-guests',
   };
 
   var cssClass = {
@@ -34,6 +37,9 @@
     addressInput: document.querySelector(selector.address),
     resetButton: document.querySelector(selector.adFormReset),
     housingTypeFilter: document.querySelector(selector.housingType),
+    housingPriceFilter: document.querySelector(selector.housingPrice),
+    housingRoomsFilter: document.querySelector(selector.housingRooms),
+    housingGuestsFilter: document.querySelector(selector.housingGuests),
   };
 
   /* ------------------------------ КООРДИНАТЫ ГЛАВНОЙ МЕТКИ ------------------------------ */
@@ -82,6 +88,7 @@
   // Функция деактивации страницы
   var deactivatePage = function () {
     domElement.offersMap.classList.add(cssClass.mapFaded);
+    domElement.mapFilters.reset();
     domElement.mapFilters.setAttribute('disabled', 'disabled');
     window.pin.removePins();
     window.card.closeCard();
@@ -108,7 +115,7 @@
   // Коллбэк успешной загрузки данных
   var onSuccess = function (data) {
     window.data = data;
-    filterHouseTypeData(data);
+    filterAdverts(data);
   };
 
   // Функция активации страницы
@@ -148,30 +155,82 @@
 
   /* ------------------------------ ФИЛЬТРАЦИЯ МЕТОК И ОБЪЯВЛЕНИЙ ------------------------------ */
 
-  var filterHouseTypeData = function (data) {
-    var indexesToShow = [];
-    var housingTypeFilterValue = domElement.housingTypeFilter.value;
-    if (housingTypeFilterValue === 'any') {
-      for (var i = 0; i < MAP_MAX_PINS; i++) {
-        indexesToShow.push(i);
-      }
-      window.pin.showPins(data, indexesToShow);
-    } else {
-      indexesToShow = data.reduce(function (acc, advert, index) {
-
-        if (advert.offer.type === housingTypeFilterValue) {
-          acc.push(index);
-        }
-
-        return acc;
-      }, []);
-      window.pin.showPins(data, indexesToShow);
-    }
+  var PriceRange = {
+    MIN: 10000,
+    MAX: 50000,
   };
 
-  domElement.housingTypeFilter.addEventListener('change', function () {
+  // Фильтрация по типу жилья
+  var filterByType = function (advert) {
+    var housingTypeFilterValue = domElement.housingTypeFilter.value;
+    return housingTypeFilterValue === 'any' ? true : housingTypeFilterValue === advert.offer.type;
+  };
+
+  // Фильтрация по стоимости
+  var filterByPrice = function (advert) {
+    var housingPriceFilterValue = domElement.housingPriceFilter.value;
+
+    if (housingPriceFilterValue === 'any') {
+      return true;
+    } else if (housingPriceFilterValue === 'middle') {
+      return advert.offer.price <= PriceRange.MAX && advert.offer.price >= PriceRange.MIN;
+    } else if (housingPriceFilterValue === 'low') {
+      return advert.offer.price < PriceRange.MIN;
+    } else if (housingPriceFilterValue === 'high') {
+      return advert.offer.price > PriceRange.MAX;
+    }
+    return false;
+  };
+
+  // Фильтрация по количеству комнат
+  var filterByRooms = function (advert) {
+    var housingRoomsFilterValue = domElement.housingRoomsFilter.value;
+    return housingRoomsFilterValue === 'any' ? true : parseInt(housingRoomsFilterValue, 10) === advert.offer.rooms;
+  };
+
+  // Фильтрация по количеству гостей
+  var filterByGuests = function (advert) {
+    var housingGuestsFilterValue = domElement.housingGuestsFilter.value;
+    return housingGuestsFilterValue === 'any' ? true : parseInt(housingGuestsFilterValue, 10) === advert.offer.guests;
+  };
+
+  // Собрать выбранные доп. характеристики
+  var getSelectedFeatures = function () {
+    return Array.from(document.querySelectorAll('.map__checkbox:checked')).map(function (element) {
+      return element.value;
+    });
+  };
+
+  // Фильтрация по доп. характеристикам
+  var filterByFeatures = function (advert) {
+    return getSelectedFeatures().every(function (feature) {
+      return advert.offer.features.includes(feature);
+    });
+  };
+
+  // Функция фильтрации объявлений
+  var filterAdverts = function (data) {
+    var indexesToShow = [];
+
+    indexesToShow = data.reduce(function (acc, advert, index) {
+
+      if (filterByType(advert)
+        && filterByPrice(advert)
+        && filterByRooms(advert)
+        && filterByGuests(advert)
+        && filterByFeatures(advert)) {
+        acc.push(index);
+      }
+
+      return acc;
+    }, []);
+    window.pin.showPins(data, indexesToShow);
+  };
+
+  // Обработчик фильтрации объявлений
+  domElement.mapFilters.addEventListener('change', function () {
     window.card.closeCard();
-    filterHouseTypeData(window.data);
+    filterAdverts(window.data);
   });
 
   /* ------------------------------ ПЕРЕМЕЩЕНИЕ ГЛАВНОЙ МЕТКИ ПО КАРТЕ ------------------------------ */
