@@ -16,6 +16,7 @@
     errorTemplate: '#error',
     error: '.error',
     errorButton: '.error__button',
+    errorMessage: '.error__message',
     adFormReset: '.ad-form__reset',
     housingType: '#housing-type',
     housingPrice: '#housing-price',
@@ -105,6 +106,25 @@
 
   /* ------------------------------ АКТИВНЫЙ РЕЖИМ СТРАНИЦЫ ------------------------------ */
 
+  // Коллбэк успешной загрузки данных
+  var onSuccess = function (data) {
+    window.data = data;
+    filterAdverts(data);
+  };
+
+  // Внешний вид сообщения об ошибке при загрузке с сервера
+  var onLoadError = function (message) {
+    var loadErrorTemplate = document.querySelector(selector.errorTemplate).content.querySelector(selector.error);
+    var loadErrorElement = loadErrorTemplate.cloneNode(true);
+
+    var loadErrorButton = loadErrorElement.querySelector(selector.errorButton);
+    loadErrorButton.classList.add('hidden');
+
+    var loadErrorMessage = loadErrorElement.querySelector(selector.errorMessage);
+    loadErrorMessage.textContent = message;
+    document.body.appendChild(loadErrorElement);
+  };
+
   // Перевод формы в активный режим
   var activateForm = function () {
     domElement.adFormElements.forEach(function (element) {
@@ -112,17 +132,11 @@
     });
   };
 
-  // Коллбэк успешной загрузки данных
-  var onSuccess = function (data) {
-    window.data = data;
-    filterAdverts(data);
-  };
-
   // Функция активации страницы
   var activatePage = function () {
     domElement.offersMap.classList.remove(cssClass.mapFaded);
     domElement.mapFilters.removeAttribute('disabled', 'disabled');
-    window.backend.load(onSuccess, window.util.onError);
+    window.backend.load(onSuccess, onLoadError);
 
     domElement.adForm.classList.remove(cssClass.adFormDisabled);
     domElement.adFormHeader.removeAttribute('disabled', 'disabled');
