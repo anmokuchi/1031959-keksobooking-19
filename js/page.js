@@ -377,7 +377,7 @@
     addListenersOnSuccessMessage();
   };
 
-  // Скрытие сообщения
+  // Скрытие сообщения об отправке
   var removeSuccessMessage = function () {
     document.body.removeChild(successElement);
   };
@@ -403,7 +403,7 @@
     addListenersOnErrorMessage();
   };
 
-  // Скрытие сообщения
+  // Скрытие сообщения об ошибке
   var removeErrorMessage = function () {
     document.body.removeChild(errorElement);
   };
