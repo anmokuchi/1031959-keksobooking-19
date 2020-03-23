@@ -2,6 +2,7 @@
 
 (function () {
   var MAP_MAX_PINS = 5;
+  var DEBOUNCE_INTERVAL = 500; // ms
 
   var selector = {
     map: '.map',
@@ -16,13 +17,18 @@
     errorTemplate: '#error',
     error: '.error',
     errorButton: '.error__button',
+    errorMessage: '.error__message',
     adFormReset: '.ad-form__reset',
     housingType: '#housing-type',
+    housingPrice: '#housing-price',
+    housingRooms: '#housing-rooms',
+    housingGuests: '#housing-guests',
   };
 
   var cssClass = {
     mapFaded: 'map--faded',
     adFormDisabled: 'ad-form--disabled',
+    hidden: 'hidden',
   };
 
   var domElement = {
@@ -34,6 +40,9 @@
     addressInput: document.querySelector(selector.address),
     resetButton: document.querySelector(selector.adFormReset),
     housingTypeFilter: document.querySelector(selector.housingType),
+    housingPriceFilter: document.querySelector(selector.housingPrice),
+    housingRoomsFilter: document.querySelector(selector.housingRooms),
+    housingGuestsFilter: document.querySelector(selector.housingGuests),
   };
 
   /* ------------------------------ КООРДИНАТЫ ГЛАВНОЙ МЕТКИ ------------------------------ */
@@ -82,6 +91,7 @@
   // Функция деактивации страницы
   var deactivatePage = function () {
     domElement.offersMap.classList.add(cssClass.mapFaded);
+    domElement.mapFilters.reset();
     domElement.mapFilters.setAttribute('disabled', 'disabled');
     window.pin.removePins();
     window.card.closeCard();
@@ -98,6 +108,25 @@
 
   /* ------------------------------ АКТИВНЫЙ РЕЖИМ СТРАНИЦЫ ------------------------------ */
 
+  // Коллбэк успешной загрузки данных
+  var onSuccess = function (data) {
+    window.data = data;
+    filterAdverts(data);
+  };
+
+  // Внешний вид сообщения об ошибке при загрузке с сервера
+  var onLoadError = function (message) {
+    var loadErrorTemplate = document.querySelector(selector.errorTemplate).content.querySelector(selector.error);
+    var loadErrorElement = loadErrorTemplate.cloneNode(true);
+
+    var loadErrorButton = loadErrorElement.querySelector(selector.errorButton);
+    loadErrorButton.classList.add(cssClass.hidden);
+
+    var loadErrorMessage = loadErrorElement.querySelector(selector.errorMessage);
+    loadErrorMessage.textContent = message;
+    document.body.appendChild(loadErrorElement);
+  };
+
   // Перевод формы в активный режим
   var activateForm = function () {
     domElement.adFormElements.forEach(function (element) {
@@ -105,17 +134,11 @@
     });
   };
 
-  // Коллбэк успешной загрузки данных
-  var onSuccess = function (data) {
-    window.data = data;
-    filterHouseTypeData(data);
-  };
-
   // Функция активации страницы
   var activatePage = function () {
     domElement.offersMap.classList.remove(cssClass.mapFaded);
     domElement.mapFilters.removeAttribute('disabled', 'disabled');
-    window.backend.load(onSuccess, window.util.onError);
+    window.backend.load(onSuccess, onLoadError);
 
     domElement.adForm.classList.remove(cssClass.adFormDisabled);
     domElement.adFormHeader.removeAttribute('disabled', 'disabled');
@@ -146,33 +169,103 @@
   pinMain.element.addEventListener('mousedown', onPinMainLeftButtonClick);
   pinMain.element.addEventListener('keydown', onPinMainEnterPress);
 
-  /* ------------------------------ ФИЛЬТРАЦИЯ МЕТОК И ОБЪЯВЛЕНИЙ ------------------------------ */
+  /* ------------------------------ УСТРАНЕНИЕ ДРЕБЕЗГА ------------------------------ */
 
-  var filterHouseTypeData = function (data) {
-    var indexesToShow = [];
-    var housingTypeFilterValue = domElement.housingTypeFilter.value;
-    if (housingTypeFilterValue === 'any') {
-      for (var i = 0; i < MAP_MAX_PINS; i++) {
-        indexesToShow.push(i);
-      }
-      window.pin.showPins(data, indexesToShow);
-    } else {
-      indexesToShow = data.reduce(function (acc, advert, index) {
+  var lastTimeout;
 
-        if (advert.offer.type === housingTypeFilterValue) {
-          acc.push(index);
-        }
-
-        return acc;
-      }, []);
-      window.pin.showPins(data, indexesToShow);
+  var debounce = function (callback) {
+    if (lastTimeout) {
+      window.clearTimeout(lastTimeout);
     }
+    lastTimeout = window.setTimeout(callback, DEBOUNCE_INTERVAL);
   };
 
-  domElement.housingTypeFilter.addEventListener('change', function () {
-    window.card.closeCard();
-    filterHouseTypeData(window.data);
-  });
+  /* ------------------------------ ФИЛЬТРАЦИЯ МЕТОК И ОБЪЯВЛЕНИЙ ------------------------------ */
+
+  var PriceRange = {
+    MIN: 10000,
+    MAX: 50000,
+  };
+
+  // Фильтрация по типу жилья
+  var filterByType = function (advert) {
+    var housingTypeFilterValue = domElement.housingTypeFilter.value;
+    return housingTypeFilterValue === 'any' ? true : housingTypeFilterValue === advert.offer.type;
+  };
+
+  // Фильтрация по стоимости
+  var filterByPrice = function (advert) {
+    var housingPriceFilterValue = domElement.housingPriceFilter.value;
+
+    if (housingPriceFilterValue === 'any') {
+      return true;
+    } else if (housingPriceFilterValue === 'middle') {
+      return advert.offer.price <= PriceRange.MAX && advert.offer.price >= PriceRange.MIN;
+    } else if (housingPriceFilterValue === 'low') {
+      return advert.offer.price < PriceRange.MIN;
+    } else if (housingPriceFilterValue === 'high') {
+      return advert.offer.price > PriceRange.MAX;
+    }
+    return false;
+  };
+
+  // Фильтрация по количеству комнат
+  var filterByRooms = function (advert) {
+    var housingRoomsFilterValue = domElement.housingRoomsFilter.value;
+    return housingRoomsFilterValue === 'any' ? true : parseInt(housingRoomsFilterValue, 10) === advert.offer.rooms;
+  };
+
+  // Фильтрация по количеству гостей
+  var filterByGuests = function (advert) {
+    var housingGuestsFilterValue = domElement.housingGuestsFilter.value;
+    return housingGuestsFilterValue === 'any' ? true : parseInt(housingGuestsFilterValue, 10) === advert.offer.guests;
+  };
+
+  // Собрать выбранные доп. характеристики
+  var getSelectedFeatures = function () {
+    return Array.from(document.querySelectorAll('.map__checkbox:checked')).map(function (element) {
+      return element.value;
+    });
+  };
+
+  // Фильтрация по доп. характеристикам
+  var filterByFeatures = function (advert) {
+    return getSelectedFeatures().every(function (feature) {
+      return advert.offer.features.includes(feature);
+    });
+  };
+
+  // Функция фильтрации объявлений
+  var filterAdverts = function (data) {
+    var indexesToShow = [];
+
+    indexesToShow = data.reduce(function (acc, advert, index) {
+
+      if (filterByType(advert)
+        && filterByPrice(advert)
+        && filterByRooms(advert)
+        && filterByGuests(advert)
+        && filterByFeatures(advert)) {
+        acc.push(index);
+      }
+      if (acc.length >= MAP_MAX_PINS) {
+        acc.splice(5);
+      }
+
+      return acc;
+    }, []);
+    window.pin.showPins(data, indexesToShow);
+  };
+
+  // Обработчик фильтрации объявлений
+  var onFiltersChange = function () {
+    debounce(function () {
+      window.card.closeCard();
+      filterAdverts(window.data);
+    });
+  };
+
+  domElement.mapFilters.addEventListener('change', onFiltersChange);
 
   /* ------------------------------ ПЕРЕМЕЩЕНИЕ ГЛАВНОЙ МЕТКИ ПО КАРТЕ ------------------------------ */
 
