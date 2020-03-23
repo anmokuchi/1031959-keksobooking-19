@@ -377,10 +377,12 @@
     addListenersOnSuccessMessage();
   };
 
+  // Скрытие сообщения
   var removeSuccessMessage = function () {
     document.body.removeChild(successElement);
   };
 
+  // Добавление обработчиков
   var addListenersOnSuccessMessage = function () {
     document.addEventListener('click', function () {
       removeSuccessMessage();
@@ -401,10 +403,12 @@
     addListenersOnErrorMessage();
   };
 
+  // Скрытие сообщения
   var removeErrorMessage = function () {
     document.body.removeChild(errorElement);
   };
 
+  // Добавление обработчиков
   var addListenersOnErrorMessage = function () {
     var errorButton = document.querySelector(selector.errorButton);
 
