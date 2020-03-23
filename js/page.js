@@ -256,20 +256,20 @@
   var filterAdverts = function (data) {
     var indexesToShow = [];
 
-    indexesToShow = data.reduce(function (acc, advert, index) {
+    indexesToShow = data.reduce(function (accumulator, advert, index) {
 
       if (filterByType(advert)
         && filterByPrice(advert)
         && filterByRooms(advert)
         && filterByGuests(advert)
         && filterByFeatures(advert)) {
-        acc.push(index);
+        accumulator.push(index);
       }
-      if (acc.length >= MAP_MAX_PINS) {
-        acc.splice(5);
+      if (accumulator.length >= MAP_MAX_PINS) {
+        accumulator.splice(5);
       }
 
-      return acc;
+      return accumulator;
     }, []);
     window.pin.showPins(data, indexesToShow);
   };

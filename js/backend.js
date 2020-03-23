@@ -3,13 +3,12 @@
 (function () {
   var LOAD_URL = 'https://js.dump.academy/keksobooking/data';
   var SAVE_URL = 'https://js.dump.academy/keksobooking';
+  var RESPONSE_TYPE = 'json';
+  var TIMEOUT_IN_MS = 10000; // 10 s;
 
   var StatusCode = {
     OK: 200
   };
-
-  var RESPONSE_TYPE = 'json';
-  var TIMEOUT_IN_MS = 10000; // 10 s;
 
   var sendRequest = function (options, onLoad, onError) {
     var xhr = new XMLHttpRequest();

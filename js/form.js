@@ -61,7 +61,7 @@
     },
   };
 
-  var roomsNumberValidity = function () {
+  var validateRoomsNumber = function () {
     var roomValue = domElement.roomsNumber.value;
     var guestValue = domElement.guestsNumber.value;
     var maxGuest = roomSetting[roomValue].maxGuest;
@@ -74,10 +74,10 @@
     }
   };
 
-  roomsNumberValidity();
+  validateRoomsNumber();
 
-  domElement.roomsNumber.addEventListener('change', roomsNumberValidity);
-  domElement.guestsNumber.addEventListener('change', roomsNumberValidity);
+  domElement.roomsNumber.addEventListener('change', validateRoomsNumber);
+  domElement.guestsNumber.addEventListener('change', validateRoomsNumber);
 
   /* ------------------------------ СИНХРОНИЗАЦИЯ ВРЕМЕНИ ВЪЕЗДА И ВРЕМЕНИ ВЫЕЗДА ------------------------------ */
 
