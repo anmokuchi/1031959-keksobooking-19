@@ -23,6 +23,7 @@
     housingPrice: '#housing-price',
     housingRooms: '#housing-rooms',
     housingGuests: '#housing-guests',
+    checkedCheckbox: '.map__checkbox:checked',
   };
 
   var cssClass = {
@@ -88,11 +89,19 @@
     });
   };
 
+  // Перевод фильтров в неактивный режим
+  var mapFiltersCollection = domElement.mapFilters.children;
+  var disableMapFilters = function () {
+    Array.from(mapFiltersCollection).forEach(function (element) {
+      element.setAttribute('disabled', 'disabled');
+    });
+  };
+
   // Функция деактивации страницы
   var deactivatePage = function () {
     domElement.offersMap.classList.add(cssClass.mapFaded);
     domElement.mapFilters.reset();
-    domElement.mapFilters.setAttribute('disabled', 'disabled');
+    disableMapFilters();
     window.pin.removePins();
     window.card.closeCard();
     setDefaultPinMainPosition();
@@ -134,10 +143,17 @@
     });
   };
 
+  // Перевод фильтров в неактивный режим
+  var enableMapFilters = function () {
+    Array.from(mapFiltersCollection).forEach(function (element) {
+      element.removeAttribute('disabled', 'disabled');
+    });
+  };
+
   // Функция активации страницы
   var activatePage = function () {
     domElement.offersMap.classList.remove(cssClass.mapFaded);
-    domElement.mapFilters.removeAttribute('disabled', 'disabled');
+    enableMapFilters();
     window.backend.load(onSuccess, onLoadError);
 
     domElement.adForm.classList.remove(cssClass.adFormDisabled);
@@ -146,6 +162,7 @@
     domElement.addressInput.value = getMainPinCoordinatesValue(pinMain, true);
   };
 
+  // Показ карточки по клику на пин
   window.pin.onPinClick(function (index) {
     window.card.showCard(index);
   });
@@ -223,7 +240,7 @@
 
   // Собрать выбранные доп. характеристики
   var getSelectedFeatures = function () {
-    return Array.from(document.querySelectorAll('.map__checkbox:checked')).map(function (element) {
+    return Array.from(document.querySelectorAll(selector.checkedCheckbox)).map(function (element) {
       return element.value;
     });
   };

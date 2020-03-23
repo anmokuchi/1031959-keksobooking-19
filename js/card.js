@@ -37,10 +37,10 @@
     if (photos === undefined) {
       photosContainer.classList.add(cssClass.hidden);
     } else {
-      for (var j = 0; j < photos.length; j++) {
+      for (var i = 0; i < photos.length; i++) {
         var newPopupPhoto = document.createElement('img');
         newPopupPhoto.className = 'popup__photo';
-        newPopupPhoto.src = photos[j];
+        newPopupPhoto.src = photos[i];
         newPopupPhoto.width = '45';
         newPopupPhoto.height = '40';
         newPopupPhoto.alt = 'Фотография жилья';
@@ -54,10 +54,10 @@
     if (features === undefined) {
       featuresContainer.classList.add(cssClass.hidden);
     } else {
-      for (var k = 0; k < features.length; k++) {
+      for (var j = 0; j < features.length; j++) {
         var newPopupFeature = document.createElement('li');
         newPopupFeature.className =
-          'popup__feature popup__feature--' + features[k];
+          'popup__feature popup__feature--' + features[j];
         featuresContainer.appendChild(newPopupFeature);
       }
     }
