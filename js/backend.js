@@ -10,6 +10,7 @@
     OK: 200
   };
 
+  // Функция получения и отправки данных
   var sendRequest = function (options, onLoad, onError) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = options.responseType || RESPONSE_TYPE;
